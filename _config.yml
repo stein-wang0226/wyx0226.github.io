@@ -11,7 +11,7 @@ locale                   : "en-US"
 title                    : "Yuxiang Wang"
 title_separator          : "-"
 name                     : &name "Yuxiang Wang"
-description              : &description "Personal homepage of Yuxiang Wang — incoming Master's student at Fudan University. Research interests: Multimodal LLMs, Diffusion Language Models, Protein Agents, GNNs."
+description              : &description "Personal homepage of Yuxiang Wang — Master's student at Fudan University. Research interests: LLMs (Agents), Diffusion Language Models, AI4S, Multimodal LLMs, GNNs."
 url                      : https://stein-wang0226.github.io
 baseurl                  : "/wyx0226.github.io"
 repository               : "stein-wang0226/wyx0226.github.io"
@@ -24,7 +24,7 @@ author:
   avatar           : "profile.png"
   name             : "Yuxiang Wang"
   pronouns         : # example: "she/her"
-  bio              : "Incoming MS @ Fudan University. Research interests: Multimodal LLMs, Diffusion Language Models, Protein Agents, GNNs."
+  bio              : "MS @ Fudan University. Research interests: LLMs (Agents), Diffusion Language Models, AI4S, Multimodal LLMs, GNNs."
   location         : "Shanghai, China"
   employer         : "Fudan University"
   uri              : # URL

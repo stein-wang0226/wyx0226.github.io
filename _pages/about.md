@@ -7,14 +7,16 @@ redirect_from:
   - /about.html
 ---
 
-I am an incoming Master's student at the [School of Data Science](https://sds.fudan.edu.cn/), [Fudan University](https://www.fudan.edu.cn/), advised at the Knowledge Works Lab. I received my B.Eng. in Computer Science (Honors Class) from the [Zhuoyue Honor College](https://zhuoyue.hdu.edu.cn/), [Hangzhou Dianzi University](https://www.hdu.edu.cn/) in June 2025, where I was fortunate to be advised by [Prof. Wang](https://wyxlss.github.io/).
+I am a first-year Master's student at the [School of Data Science](https://sds.fudan.edu.cn/), [Fudan University](https://www.fudan.edu.cn/), at the Knowledge Works Lab. I received my B.Eng. in Computer Science (Honors Class) from the [Zhuoyue Honor College](https://zhuoyue.hdu.edu.cn/), [Hangzhou Dianzi University](https://www.hdu.edu.cn/) in June 2025, where I was fortunate to be advised by [Prof. Wang](https://wyxlss.github.io/).
 
 ## Research Interests
 
-My research focuses on building **scalable foundation models** that go beyond pure autoregressive generation, with current emphasis on:
+My research interests span:
 
+- **LLMs (Agents)** — post-training, tool use, multi-turn reasoning (Thought→Action→Observation), and RL for agents
 - **Diffusion Language Models** — locality-aware architectures, training stability, and the inductive-bias / task-structure relationship
-- **Multimodal Foundation Models for Science (AI4S)** — unified protein–text modeling, evaluation infrastructure, and Protein Agents
+- **AI4S** — protein/small-molecule modeling, unified evaluation frameworks, and Protein Agents
+- **Multimodal LLMs** — unified understanding & generation, e.g. protein ↔ text bidirectional modeling
 - **Graph Neural Networks** — dynamic-graph reasoning, fraud detection on spatio-temporal graphs
 
 ## News
