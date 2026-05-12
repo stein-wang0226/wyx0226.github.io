@@ -4,8 +4,8 @@ collection: publications
 permalink: /publication/2026-semantic-diffusion-lm
 excerpt: 'Investigates how the noising-kernel design in discrete diffusion language models affects training stability and generation quality. Proposes SemDLM with semantic-neighborhood diffusion, a shared refresh branch, and token-frequency prior correction. Achieves 27.19 Test PPL on LM1B.'
 date: 2026-02-01
-venue: 'Under review at ICML 2026'
-citation: 'et al., Yuxiang Wang. "Semantic Diffusion Language Modeling." <i>Under review</i>, 2026.'
+venue: 'Preprint, 2026'
+citation: 'et al., Yuxiang Wang. "Semantic Diffusion Language Modeling." 2026.'
 ---
 
 ## Summary

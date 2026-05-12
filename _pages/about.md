@@ -30,8 +30,8 @@ My research interests span:
 
 ## Selected Publications
 
-- **Locality-aware Diffusion Language Modeling** — *Under review at ICML.* First author. Studies the trainability of Masked Diffusion LMs and proposes two locality-aware blockwise architectures (*Scatter* and *Jigsaw*) bridging AR and Diffusion regimes.
-- **Spatio-Temporal Distance and Frame-Based Dynamic Graph Fraud Detection (STM)** — *CCF-B venue.* First author. Frame-wise intra/inter aggregation over dynamic graphs achieves SOTA on multiple benchmarks. Resulted in an invention patent.
-- **Semantic Diffusion Language Modeling (SemDLM)** — *Under review at ICML.* Co-author. Semantic-neighborhood diffusion + shared refresh branch reaches 27.19 Test PPL on LM1B.
+- **Locality-aware Diffusion Language Modeling** — *Sole first author.* Studies the trainability of Masked Diffusion LMs and proposes two locality-aware blockwise architectures (*Scatter* and *Jigsaw*) bridging AR and Diffusion regimes.
+- **Spatio-Temporal Distance and Frame-Based Dynamic Graph Fraud Detection (STM)** — *First author, CCF-B venue.* Frame-wise intra/inter aggregation over dynamic graphs achieves SOTA on multiple benchmarks. Resulted in an invention patent.
+- **Semantic Diffusion Language Modeling (SemDLM)** — *Co-author.* Semantic-neighborhood diffusion + shared refresh branch reaches 27.19 Test PPL on LM1B.
 
 You can find my full [Curriculum Vitae](../assets/Curriculum_Vitae.pdf) for more details.
