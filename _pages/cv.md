@@ -33,13 +33,13 @@ Honors & Awards
 
 Research Experience
 ======
-**Locality-aware Diffusion Language Modeling** &nbsp;·&nbsp; *Sole first author* &nbsp;·&nbsp; 2025.10 – 2026.03
+[**Locality-aware Diffusion Language Modeling**](https://arxiv.org/abs/2604.24832) &nbsp;·&nbsp; *Sole first author* &nbsp;·&nbsp; 2025.10 – 2026.03
 * Systematically studied the trainability of Masked Diffusion LMs vs. autoregressive LLMs across structured generation tasks, exposing how inductive bias interacts with task dependency structure.
 * Designed three controlled tasks — **in-context linear regression**, **star-graph path-finding**, and **Sudoku** — covering local exact binding, reverse planning, and global constraint satisfaction.
 * Proposed two locality-aware blockwise diffusion architectures: **Scatter** ("intra-block AR + inter-block synchronous update") and **Jigsaw** ("intra-block AR + inter-block entropy-guided dynamic programming"), unifying local ordering with global iterative refinement.
 * Findings: AR is better suited for local binding & sequential generation; Diffusion is better suited for global planning & constraint satisfaction. Provides empirical foundations for dLLM architecture design and future Agent planning research.
 
-**STM: Spatio-Temporal Distance and Frame-Based Dynamic Graph Fraud Detection** &nbsp;·&nbsp; *First author (CCF-B), Invention Patent* &nbsp;·&nbsp; 2023.04 – 2024.08
+[**STM: Spatio-Temporal Distance and Frame-Based Dynamic Graph Fraud Detection**](https://link.springer.com/chapter/10.1007/978-981-95-3906-2_3) &nbsp;·&nbsp; *First author (CCF-B), Invention Patent* &nbsp;·&nbsp; 2023.04 – 2024.08
 * Identified that conventional GNN-based fraud detectors fail to fully exploit spatio-temporal information on dynamic graphs.
 * Proposed **STM**, combining graph condensation, distance-aware intra-frame aggregation, and difference-aware inter-frame aggregation to capture both short- and long-range temporal–spatial signals.
 * Achieved **SOTA** on multiple dynamic-graph fraud-detection benchmarks. Outcome: CCF-B publication and granted invention patent.
