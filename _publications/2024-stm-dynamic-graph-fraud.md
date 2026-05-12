@@ -4,8 +4,9 @@ collection: publications
 permalink: /publication/2024-stm-dynamic-graph-fraud
 excerpt: 'Proposes STM, a dynamic-graph fraud-detection model that combines graph condensation, distance-aware intra-frame aggregation, and difference-aware inter-frame aggregation to fully exploit short- and long-range spatio-temporal information. Achieves SOTA on multiple dynamic-graph benchmarks. Also resulted in an invention patent.'
 date: 2024-08-01
-venue: 'CCF-B venue'
-citation: 'Yuxiang Wang, et al. "Spatio-Temporal Distance and Frame-Based Dynamic Graph Fraud Detection." 2024.'
+venue: 'CCF-B venue (Springer)'
+paperurl: 'https://link.springer.com/chapter/10.1007/978-981-95-3906-2_3'
+citation: 'Yuxiang Wang, et al. "Spatio-Temporal Distance and Frame-Based Dynamic Graph Fraud Detection." Springer, 2024. https://doi.org/10.1007/978-981-95-3906-2_3'
 ---
 
 ## Motivation

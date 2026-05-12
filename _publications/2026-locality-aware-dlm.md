@@ -5,7 +5,8 @@ permalink: /publication/2026-locality-aware-dlm
 excerpt: 'Studies the trainability of Masked Diffusion Language Models against autoregressive LLMs across structured generation tasks. Proposes two locality-aware blockwise diffusion architectures (Scatter and Jigsaw) bridging AR-style local ordering and Diffusion-style global iterative refinement.'
 date: 2026-03-01
 venue: 'Under review at ICML 2026'
-citation: 'Yuxiang Wang, et al. "Locality-aware Diffusion Language Modeling." <i>Under review</i>, 2026.'
+paperurl: 'https://arxiv.org/abs/2604.24832'
+citation: 'Yuxiang Wang, et al. "Locality-aware Diffusion Language Modeling." <i>arXiv:2604.24832</i>, 2026. (Under review at ICML 2026.)'
 ---
 
 ## Summary
