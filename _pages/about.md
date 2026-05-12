@@ -23,7 +23,7 @@ My research interests span:
 
 ## News
 
-- **2026** — Sole first author on [**Locality-aware Diffusion Language Modeling**](https://arxiv.org/abs/2604.24832) (introducing the *Scatter* and *Jigsaw* blockwise architectures); co-author on [**Semantic Diffusion Language Modeling**]({{ base_path }}/publication/2026-semantic-diffusion-lm) — both studying training stability and architecture design of diffusion language models.
+- **2026** — Sole first author on [**Locality-aware Diffusion Language Modeling**](https://arxiv.org/abs/2604.24832) (introducing the *Scatter* and *Jigsaw* blockwise architectures); co-author on **Semantic Diffusion Language Modeling** — both studying training stability and architecture design of diffusion language models.
 - **2025.10** — Joined Alibaba (AI4S / Multimodal LLM) as a research intern.
 - **2025.09** — Started my MS at Fudan University, Knowledge Works Lab.
 - **2025.06** — Graduated from HDU as an Outstanding Graduate; admitted to Fudan University via recommendation.
