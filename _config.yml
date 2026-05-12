@@ -8,13 +8,13 @@
 
 # Basic Site Settings
 locale                   : "en-US"
-title                    : "Your Name / Site Title"
+title                    : "Yuxiang Wang"
 title_separator          : "-"
-name                     : &name "Your Name"
-description              : &description "personal description"
-url                      : https://academicpages.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
-baseurl                  : "" # the subpath of your site, e.g. "/blog"
-repository               : "academicpages/academicpages.github.io"
+name                     : &name "Yuxiang Wang"
+description              : &description "Personal homepage of Yuxiang Wang — incoming Master's student at Fudan University. Research interests: Multimodal LLMs, Diffusion Language Models, Protein Agents, GNNs."
+url                      : https://stein-wang0226.github.io
+baseurl                  : "/wyx0226.github.io"
+repository               : "stein-wang0226/wyx0226.github.io"
 
 # Site Author - The following control what appear as part of the author content on the side bar.
 #               If a field is blank the icon and link will not appear, otherwise it will be shown.
@@ -23,20 +23,20 @@ author:
   # Biographic information
   avatar           : "profile.png"
   name             : "Yuxiang Wang"
-  pronouns         : # example: "she/her"  
-  bio              : "A student majoring in computer science"
-  location         : "China"
-  employer         : "Hangzhou Dianzi University"
+  pronouns         : # example: "she/her"
+  bio              : "Incoming MS @ Fudan University. Research interests: Multimodal LLMs, Diffusion Language Models, Protein Agents, GNNs."
+  location         : "Shanghai, China"
+  employer         : "Fudan University"
   uri              : # URL
-  email            : "stein_wang@hdu.edu.cn" 
+  email            : "25210980109@m.fudan.edu.cn"
 
   # Academic websites
   arxiv            : # URL - Update with the correct link to your profile
   googlescholar    : "https://scholar.google.com/citations?user=PS_CX0AAAAAJ"
   impactstory      : # URL
-  orcid            : "http://orcid.org/yourorcidurl"
+  orcid            : # URL
   semantic         : # URL
-  pubmed           : "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
+  pubmed           : # URL
   researchgate     : # URL
 
   # Repositories and software development
@@ -48,7 +48,7 @@ author:
   stackoverflow    : # User number or user number and name (i.e., use "1" or "1/jeff-atwood")    
 
   # Social media
-  bluesky          : "bsky.app" # Replace this with you Bluesky username
+  bluesky          : # Replace this with you Bluesky username
   facebook         : # Username
   flickr           : # Username
   foursquare       : # Username
