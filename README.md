@@ -8,7 +8,7 @@ Built with [Academic Pages](https://academicpages.github.io/), a Jekyll-based te
 
 ## About me
 
-First-year M.S. student at the School of Data Science, Fudan University, advised by [Prof. Baojian Zhou](https://baojian.github.io/) at the Knowledge Works Lab.
+First-year M.S. student at the School of Data Science, Fudan University, advised by [Prof. Baojian Zhou](https://baojian.github.io/) at the [Knowledge Works Lab](http://kw.fudan.edu.cn/).
 
 Research interests: **LLMs (Agents)**, **Diffusion Language Models**, **AI4S**, **Multimodal LLMs**, **GNNs**.
 

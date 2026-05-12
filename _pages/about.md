@@ -7,7 +7,7 @@ redirect_from:
   - /about.html
 ---
 
-I am a first-year Master's student at the [School of Data Science](https://sds.fudan.edu.cn/), [Fudan University](https://www.fudan.edu.cn/), where I am very fortunate to be advised by [Prof. Baojian Zhou](https://baojian.github.io/) at the Knowledge Works Lab.
+I am a first-year Master's student at the [School of Data Science](https://sds.fudan.edu.cn/), [Fudan University](https://www.fudan.edu.cn/), where I am very fortunate to be advised by [Prof. Baojian Zhou](https://baojian.github.io/) at the [Knowledge Works Lab](http://kw.fudan.edu.cn/).
 
 I received my B.Eng. in Computer Science (Honors Class) from the [Zhuoyue Honor College](https://zhuoyue.hdu.edu.cn/), [Hangzhou Dianzi University](https://www.hdu.edu.cn/) in June 2025, where I worked with [Prof. Wang](https://wyxlss.github.io/).
 
