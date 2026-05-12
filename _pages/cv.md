@@ -44,7 +44,7 @@ Research Experience
 * Proposed **STM**, combining graph condensation, distance-aware intra-frame aggregation, and difference-aware inter-frame aggregation to capture both short- and long-range temporal–spatial signals.
 * Achieved **SOTA** on multiple dynamic-graph fraud-detection benchmarks. Outcome: CCF-B publication and granted invention patent.
 
-**Semantic Diffusion Language Modeling (SemDLM)** &nbsp;·&nbsp; *Co-author*
+**Semantic Diffusion Language Modeling (SemDLM)** &nbsp;·&nbsp; *Second author*
 * Studied how the noising kernel design in discrete diffusion LMs affects training stability and generation quality; proposed a unified bias–variance trade-off framework.
 * Proposed **SemDLM**: semantic-neighborhood diffusion + shared refresh branch + token-frequency prior correction reduces training bias/variance and strengthens sampling-time error correction.
 * Result: **27.19 Test PPL on LM1B**, outperforming multiple discrete diffusion baselines.
