@@ -35,3 +35,16 @@ My research interests span:
 - **Semantic Diffusion Language Modeling (SemDLM)** — *Second author.* Semantic-neighborhood diffusion + shared refresh branch reaches 27.19 Test PPL on LM1B.
 
 You can find my full [Curriculum Vitae](../assets/Curriculum_Vitae.pdf) for more details.
+
+---
+
+## Open-Source Study Notes — Welcome to Learn!
+
+> **I have open-sourced my study notes covering LLM, Multimodal, RL alignment, and NLP. Everyone is welcome to use them for learning and interview preparation!**
+
+| Notes | Description | Link |
+|-------|-------------|------|
+| **LLM & Multimodal Interview Notes** | Transformer, LLM Architecture, Training/RLHF/DPO, Multimodal (CLIP/LLaVA/GPT-4o), Engineering Practice | [Online Reading](https://stein-wang0226.github.io/mllm-interview-notes/) |
+| **RL for LLM Alignment Quick Reference** | Policy Gradient → PPO, GRPO, RLHF Pipeline, DPO Derivation, Algorithm Comparison | [Online Reading](https://stein-wang0226.github.io/mllm-interview-notes/rl-interview-guide.html) |
+| **VLM Knowledge & Interview Guide (2025-2026)** | Visual Encoder, VLM Architecture, Alignment Training, Resolution Strategy, MoE, Latest Progress | [Online Reading](https://stein-wang0226.github.io/mllm-interview-notes/vlm-knowledge-interview.html) |
+| **NLP & LLM Course Notes** | Tokenization, N-gram, Embeddings, Neural LM, Transformer, GPT, BERT, RLHF (Fudan CS40008) | [Online Reading](https://stein-wang0226.github.io/llm-study-notes/) |
