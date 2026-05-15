@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLM 算法知识与面经汇总 (2025-2026)</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2b6cb0;
+            --accent: #38b2ac;
+            --accent-light: #81e6d9;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --code-bg: #1a202c;
+            --code-text: #e2e8f0;
+            --highlight: #fefcbf;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar TOC */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            background: var(--primary);
+            padding: 24px 16px;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+
+        .sidebar h2 {
+            color: var(--accent-light);
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 6px 12px;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: rgba(255,255,255,0.1);
+            color: var(--accent-light);
+        }
+
+        .sidebar .toc-h2 { font-weight: 600; margin-top: 12px; }
+        .sidebar .toc-h3 { padding-left: 20px; font-size: 12px; }
+
+        /* Main content */
+        .main {
+            margin-left: 280px;
+            padding: 40px 60px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* Header */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 48px 40px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            opacity: 0.85;
+            font-size: 15px;
+        }
+
+        .hero .tags {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .hero .tag {
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Sections */
+        h2 {
+            font-size: 22px;
+            color: var(--primary);
+            margin-top: 48px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        h3 {
+            font-size: 17px;
+            color: var(--primary-light);
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        h4 {
+            font-size: 15px;
+            color: var(--text);
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        p { margin-bottom: 12px; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 13px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f0f7ff; }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px 24px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 16px 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+            font-size: 13px;
+        }
+
+        :not(pre) > code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--primary-light);
+        }
+
+        /* Lists */
+        ul, ol {
+            padding-left: 24px;
+            margin-bottom: 12px;
+        }
+
+        li { margin-bottom: 6px; }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid var(--accent);
+        }
+
+        .card.warning {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+        }
+
+        .card.key-point {
+            border-left-color: var(--primary-light);
+            background: #ebf8ff;
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        /* Diagrams (ASCII art) */
+        .diagram {
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre;
+        }
+
+        /* Keyword highlight */
+        .keyword {
+            background: linear-gradient(120deg, var(--highlight) 0%, var(--highlight) 100%);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        strong { color: var(--primary); }
+
+        /* Mobile responsive */
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 20px; }
+            .hero { padding: 32px 24px; }
+            .menu-btn { display: block; }
+        }
+
+        .menu-btn {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 200;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        @media (max-width: 1024px) {
+            .menu-btn { display: block; }
+        }
+
+        /* Scrollbar */
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+        /* Print */
+        @media print {
+            .sidebar, .menu-btn { display: none; }
+            .main { margin-left: 0; max-width: 100%; }
+            .hero { background: #f0f0f0 !important; color: #333 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<nav class="sidebar">
+    <h2>目录导航</h2>
+    <ul>
+        <li class="toc-h2"><a href="#sec1">一、核心知识体系</a></li>
+        <li class="toc-h3"><a href="#sec1-1">1.1 视觉编码器</a></li>
+        <li class="toc-h3"><a href="#sec1-2">1.2 主流架构</a></li>
+        <li class="toc-h3"><a href="#sec1-3">1.3 视觉-语言对齐</a></li>
+        <li class="toc-h3"><a href="#sec1-4">1.4 训练阶段</a></li>
+        <li class="toc-h3"><a href="#sec1-5">1.5 分辨率处理</a></li>
+        <li class="toc-h3"><a href="#sec1-6">1.6 MoE 应用</a></li>
+        <li class="toc-h2"><a href="#sec2">二、最新进展 (2025-2026)</a></li>
+        <li class="toc-h3"><a href="#sec2-1">2.1 重要模型发布</a></li>
+        <li class="toc-h3"><a href="#sec2-2">2.2 架构创新</a></li>
+        <li class="toc-h3"><a href="#sec2-3">2.3 训练范式变化</a></li>
+        <li class="toc-h3"><a href="#sec2-4">2.4 Benchmark 趋势</a></li>
+        <li class="toc-h3"><a href="#sec2-5">2.5 新兴方向</a></li>
+        <li class="toc-h2"><a href="#sec3">三、面试高频问答</a></li>
+        <li class="toc-h3"><a href="#q1">Q1: CLIP vs SigLIP</a></li>
+        <li class="toc-h3"><a href="#q2">Q2: LLaVA 训练流水线</a></li>
+        <li class="toc-h3"><a href="#q3">Q3: Connector 作用</a></li>
+        <li class="toc-h3"><a href="#q4">Q4: 高分辨率处理</a></li>
+        <li class="toc-h3"><a href="#q5">Q5: Visual Grounding</a></li>
+        <li class="toc-h3"><a href="#q6">Q6: MoE in VLM</a></li>
+        <li class="toc-h3"><a href="#q7">Q7: 视频理解</a></li>
+        <li class="toc-h3"><a href="#q8">Q8: RLHF/DPO for VLM</a></li>
+        <li class="toc-h3"><a href="#q9">Q9: 减少幻觉</a></li>
+        <li class="toc-h3"><a href="#q10">Q10: 多模态 RAG</a></li>
+        <li class="toc-h3"><a href="#q11">Q11: 高效部署</a></li>
+        <li class="toc-h2"><a href="#sec4">四、代码实现题</a></li>
+        <li class="toc-h3"><a href="#code1">4.1 Visual Projector</a></li>
+        <li class="toc-h3"><a href="#code2">4.2 Attention Mask</a></li>
+        <li class="toc-h3"><a href="#code3">4.3 Image Tiling</a></li>
+        <li class="toc-h2"><a href="#sec5">五、必知论文</a></li>
+        <li class="toc-h2"><a href="#sec6">六、面试总结</a></li>
+    </ul>
+</nav>
+
+<main class="main">
+
+<!-- Hero -->
+<div class="hero">
+    <h1>VLM 算法知识与面经汇总</h1>
+    <p>面向 2025-2026 年 Vision-Language Model 方向求职者的全面复习指南</p>
+    <div class="tags">
+        <span class="tag">架构演进</span>
+        <span class="tag">训练范式</span>
+        <span class="tag">最新进展</span>
+        <span class="tag">面试问答</span>
+        <span class="tag">代码实现</span>
+        <span class="tag">系统设计</span>
+    </div>
+</div>
+
+<!-- Section 1 -->
+<h2 id="sec1">一、VLM 核心知识体系</h2>
+
+<h3 id="sec1-1">1.1 视觉编码器 (Visual Encoder)</h3>
+
+<h4>Vision Transformer (ViT)</h4>
+<ul>
+    <li>将图像切分为固定大小的 patch（通常 14×14 或 16×16 像素）</li>
+    <li>每个 patch 通过线性投影得到一个 token embedding</li>
+    <li>添加位置编码（positional embedding）保留空间信息</li>
+    <li>经过标准 Transformer Encoder 层（Self-Attention + FFN）</li>
+    <li>输出：一组 patch 特征向量（如 224×224 图像 + 14×14 patch = <strong>256 个 token</strong>）</li>
+</ul>
+
+<h4>CLIP Visual Encoder</h4>
+<ul>
+    <li>在 <strong>400M+</strong> 图文对上通过对比学习训练</li>
+    <li>使用 ViT-L/14 架构（304M 参数）</li>
+    <li>Softmax-based InfoNCE Loss：对 batch 中 N 个图文对构建 N×N 相似度矩阵</li>
+    <li>生成与语言语义对齐的视觉特征</li>
+</ul>
+
+<h4>SigLIP (Sigmoid Loss for Image-Language Pre-training)</h4>
+<div class="card key-point">
+    <h4>核心区别</h4>
+    <p>用 <strong>sigmoid 二分类 loss</strong> 替代 softmax 对比 loss。每对图文独立判断是否匹配，无需全局归一化。对 batch size 不敏感，分布式训练更友好。</p>
+    <p>典型架构：SigLIP-SO400M/14。使用模型：PaLI-X, Gemini, LLaVA-1.6+, InternVL2</p>
+</div>
+
+<h4>EVA-CLIP</h4>
+<ul>
+    <li>两阶段：先用 Masked Image Modeling (MIM) 预训练 ViT，再做 CLIP 对比学习</li>
+    <li>EVA-02 使用 RoPE + SwiGLU FFN</li>
+    <li>使用模型：Qwen-VL (EVA-CLIP-14B), InternVL (InternViT-6B)</li>
+</ul>
+
+<h3 id="sec1-2">1.2 VLM 主流架构</h3>
+
+<table>
+    <tr>
+        <th>架构类型</th>
+        <th>代表模型</th>
+        <th>Visual Token 开销</th>
+        <th>LLM 修改</th>
+        <th>优劣势</th>
+    </tr>
+    <tr>
+        <td><strong>Cross-Attention</strong></td>
+        <td>Flamingo, Otter</td>
+        <td>无（独立通道）</td>
+        <td>新增 Cross-Attn 层</td>
+        <td>模块化；不占上下文长度 / 复杂度高</td>
+    </tr>
+    <tr>
+        <td><strong>Decoder-Only + Tokens</strong></td>
+        <td>LLaVA, Qwen-VL, InternVL</td>
+        <td>是（占上下文）</td>
+        <td>无</td>
+        <td>简单高效；2024-2025 主流 / Token 占序列</td>
+    </tr>
+    <tr>
+        <td><strong>Encoder-Decoder</strong></td>
+        <td>PaLI, CoCa</td>
+        <td>编码器输出</td>
+        <td>完整 E-D 结构</td>
+        <td>完整架构 / 不够灵活</td>
+    </tr>
+</table>
+
+<div class="card">
+    <h4>Decoder-Only + Visual Tokens（主流方案）</h4>
+    <pre><code>[BOS] [IMG_1] [IMG_2] ... [IMG_256] [User query tokens] [Response tokens]</code></pre>
+    <p>视觉特征投影到 LLM embedding 空间后与文本 token 拼接，由标准 decoder-only transformer 统一处理。</p>
+</div>
+
+<h3 id="sec1-3">1.3 视觉-语言对齐 (Visual-Language Alignment)</h3>
+
+<h4>连接器模块 (Connector/Projector)</h4>
+
+<table>
+    <tr><th>模块</th><th>机制</th><th>输出 Token 数</th><th>代表模型</th></tr>
+    <tr><td>Linear Projection</td><td>单层线性映射</td><td>与 ViT 输出相同</td><td>LLaVA v1</td></tr>
+    <tr><td><strong>MLP Projector</strong></td><td>2层 MLP + GELU</td><td>与 ViT 输出相同</td><td>LLaVA-1.5, LLaVA-NeXT</td></tr>
+    <tr><td>Q-Former</td><td>32 可学习 query + 交叉注意力</td><td>固定 32</td><td>BLIP-2, InstructBLIP</td></tr>
+    <tr><td>Perceiver Resampler</td><td>latent tokens + 交叉注意力</td><td>固定 64/128</td><td>Flamingo, Idefics</td></tr>
+    <tr><td>C-Abstractor</td><td>卷积 + 注意力压缩</td><td>可配置</td><td>Honeybee</td></tr>
+    <tr><td>Spatial Merge</td><td>相邻 2×2 token 合并</td><td>1/4 输入</td><td>Qwen2-VL</td></tr>
+</table>
+
+<div class="card key-point">
+    <h4>关键结论 (LLaVA-1.5)</h4>
+    <p>当视觉编码器和 LLM 都足够强时，<strong>简单的 MLP projector 即可达到最优效果</strong>。过度设计的连接器（如 Q-Former）可能形成信息瓶颈。</p>
+</div>
+
+<h3 id="sec1-4">1.4 训练阶段 (Training Stages)</h3>
+
+<table>
+    <tr><th>阶段</th><th>目标</th><th>数据</th><th>可训练模块</th></tr>
+    <tr><td><strong>Stage 1:</strong> 预训练</td><td>跨模态对齐</td><td>大规模图文对 (CC3M, LAION)</td><td>仅 Connector</td></tr>
+    <tr><td><strong>Stage 2:</strong> 指令微调</td><td>多模态指令跟随</td><td>高质量指令数据 (665K)</td><td>Connector + LLM</td></tr>
+    <tr><td><strong>Stage 3:</strong> RLHF/DPO</td><td>减少幻觉，提升对齐</td><td>偏好对数据</td><td>全模型</td></tr>
+    <tr><td><strong>Stage 4:</strong> 高分辨率适配</td><td>细粒度视觉理解</td><td>文档/图表/高分辨率数据</td><td>可能解冻 ViT</td></tr>
+</table>
+
+<h3 id="sec1-5">1.5 分辨率处理 (Resolution Handling)</h3>
+
+<h4>Dynamic Tiling / AnyRes（主流方案）</h4>
+
+<div class="diagram">输入: 1344×896 图像, tile_size=336
+
+1. 确定最佳网格: 1344/336=4 列, 896/336≈3 行 → 4×3 网格
+2. Resize 到 1344×1008 适配网格
+3. 切分为 12 个 336×336 tiles
+4. 创建 1 个 336×336 缩略图（全局视图）
+5. 每个 tile + 缩略图独立编码
+6. 拼接: 12 tiles + 1 thumbnail = 13 × 256 = 3328 visual tokens</div>
+
+<h4>Native Dynamic Resolution (Qwen2-VL)</h4>
+<ul>
+    <li>使用 <strong>2D-RoPE</strong> 替代绝对位置编码 → 天然支持任意分辨率</li>
+    <li>Spatial Merge (2×2→1)：减少 4× token 数</li>
+    <li>无需 tiling，更优雅</li>
+</ul>
+
+<h3 id="sec1-6">1.6 Mixture-of-Experts (MoE) 在 VLM 中的应用</h3>
+
+<div class="card">
+    <h4>核心思想</h4>
+    <p>用多个"专家"FFN 替代单个 dense FFN，路由器为每个 token 选择 top-k 专家。只有被选中的专家参与计算 → <strong>大容量 + 低计算量</strong>。</p>
+</div>
+
+<table>
+    <tr><th>模型</th><th>总参数</th><th>激活参数</th><th>效果</th></tr>
+    <tr><td>Qwen3-VL-30B-A3B</td><td>30B</td><td>3B</td><td>媲美 10B+ 密集模型</td></tr>
+    <tr><td>Qwen3-VL-235B-A22B</td><td>235B</td><td>22B</td><td>前沿水平</td></tr>
+    <tr><td>DeepSeek-VL2</td><td>27B (MoE)</td><td>~5B</td><td>竞争力强</td></tr>
+</table>
+
+<!-- Section 2 -->
+<h2 id="sec2">二、2025-2026 最新进展</h2>
+
+<h3 id="sec2-1">2.1 重要模型发布</h3>
+
+<h4>闭源模型</h4>
+<table>
+    <tr><th>模型</th><th>时间</th><th>关键特性</th></tr>
+    <tr><td>GPT-4o</td><td>2024.05</td><td>原生多模态，统一文本/图像/音频</td></tr>
+    <tr><td>o3 / o4-mini</td><td>2025.04</td><td>多模态推理，"看图思考" CoT</td></tr>
+    <tr><td>GPT-5</td><td>2025.08</td><td>400K 上下文，MMMU 79.1%</td></tr>
+    <tr><td>GPT-5.5</td><td>2026.04</td><td>1M 上下文，首个"完全推理"模型</td></tr>
+    <tr><td>Gemini 2.5 Pro</td><td>2025.03</td><td>内置 thinking，MMMU-Pro 领先</td></tr>
+    <tr><td>Gemini 3 Pro</td><td>2026.03</td><td>像素精准定位，10FPS 视频分析</td></tr>
+</table>
+
+<h4>开源模型</h4>
+<table>
+    <tr><th>模型</th><th>时间</th><th>关键创新</th></tr>
+    <tr><td>Qwen2.5-VL</td><td>2025.01</td><td>原生动态分辨率 ViT，Dynamic FPS</td></tr>
+    <tr><td><strong>Qwen3-VL</strong></td><td>2025.10</td><td>Interleaved-MRoPE, DeepStack, MoE</td></tr>
+    <tr><td>InternVL3</td><td>2025</td><td>RL 训练管线，MMMU 72.2%</td></tr>
+    <tr><td><strong>InternVL3.5</strong></td><td>2025</td><td>Cascade RL (MPO+GSPO)，MMMU 77.7%</td></tr>
+    <tr><td>DeepSeek-VL2</td><td>2024.12</td><td>MoE backbone，动态 tiling</td></tr>
+    <tr><td>LLaVA-OneVision</td><td>2024.08</td><td>统一图像/视频/多图理解</td></tr>
+    <tr><td>SmolVLM</td><td>2025</td><td>2B SOTA 小模型</td></tr>
+</table>
+
+<h3 id="sec2-2">2.2 架构创新</h3>
+
+<div class="card">
+    <h4>原生多模态 vs 模块化</h4>
+    <ul>
+        <li><strong>模块化（主流）</strong>：ViT + Connector + LLM — 利用预训练组件</li>
+        <li><strong>原生（新兴）</strong>：从 raw token 级别统一训练 — Gemini, Chameleon, Emu3.5</li>
+        <li>NaViL (ICCV 2025) 发现：原生模型在适当 scaling 下效率更高</li>
+    </ul>
+</div>
+
+<ul>
+    <li><strong>M-RoPE → Interleaved-MRoPE</strong>：分离/交错时空维度的位置编码</li>
+    <li><strong>DeepStack (Qwen3-VL)</strong>：视觉特征深度集成到 LLM 各层</li>
+    <li><strong>Cascade RL (InternVL3.5)</strong>：离线 MPO + 在线 GSPO</li>
+    <li><strong>Visual Token 压缩</strong>：Dynamic-VLM (ICCV 2025) 减少 50-75% token</li>
+</ul>
+
+<h3 id="sec2-3">2.3 训练范式变化</h3>
+
+<h4>VLM 强化学习（最大范式转变）</h4>
+<ul>
+    <li><strong>GRPO for VLMs</strong>：扩展 DeepSeek GRPO 到多模态（InternVL3, Qwen3-VL）</li>
+    <li><strong>DPO for VLMs</strong>：Direct Preference Optimization 应用于视觉语言任务</li>
+    <li><strong>OPA-DPO (CVPR 2025)</strong>：Object-presence-aware DPO 针对幻觉</li>
+</ul>
+
+<h4>Thinking / Test-Time Compute</h4>
+<ul>
+    <li>"Thinking" 变体成为标准：Qwen3-VL-Thinking, Gemini 2.5 Pro, o3/o4</li>
+    <li>Temporal Chain of Thought (NeurIPS 2025)：逐帧推理长视频</li>
+</ul>
+
+<h4>多模态 Scaling Laws</h4>
+<div class="card key-point">
+    <p>MoE scaling 更高效：<strong>N ∝ C<sup>0.36</sup> (MoE) vs C<sup>0.53</sup> (Dense)</strong></p>
+    <p>视觉编码器比 LLM 更快饱和。最优 ViT 大小与 LLM backbone 呈对数线性关系。</p>
+</div>
+
+<h3 id="sec2-4">2.4 Benchmark 趋势</h3>
+
+<h4>MMMU (截至 2026.05)</h4>
+<table>
+    <tr><th>模型</th><th>分数</th><th>类型</th></tr>
+    <tr><td>o4-mini High</td><td>79.2%</td><td>闭源</td></tr>
+    <tr><td>GPT-5</td><td>79.1%</td><td>闭源</td></tr>
+    <tr><td>Qwen3.5-122B-A10B</td><td>78.1%</td><td>开源</td></tr>
+    <tr><td>Qwen3-VL-32B-Thinking</td><td>78.1%</td><td>开源</td></tr>
+    <tr><td>InternVL3.5-78B</td><td>77.7%</td><td>开源</td></tr>
+</table>
+
+<div class="card key-point">
+    <h4>关键趋势</h4>
+    <ul>
+        <li>开源与闭源差距缩小至 <strong>1-2%</strong></li>
+        <li>"Thinking" 变体持续优于非 thinking 版本</li>
+        <li>MoE 以更少激活参数达到前沿性能</li>
+    </ul>
+</div>
+
+<h3 id="sec2-5">2.5 新兴研究方向</h3>
+
+<table>
+    <tr><th>方向</th><th>关键进展</th></tr>
+    <tr><td><strong>长视频理解</strong></td><td>Agentic 选择性关注、Temporal CoT、Dynamic FPS</td></tr>
+    <tr><td><strong>3D/空间推理</strong></td><td>GR3D (CVPR 2026)、Gemini 3 Pro 像素精准定位</td></tr>
+    <tr><td><strong>具身智能</strong></td><td>VLA 模型、VLM 作为机器人感知骨干</td></tr>
+    <tr><td><strong>Agent VLM</strong></td><td>GUI Agent、Computer Use、视觉 grounding + RL</td></tr>
+    <tr><td><strong>长上下文视觉</strong></td><td>256K→400K→1M tokens</td></tr>
+    <tr><td><strong>VLM 可解释性</strong></td><td>Circuit Tracing (CVPR 2026)</td></tr>
+</table>
+
+<!-- Section 3 -->
+<h2 id="sec3">三、面试高频问答</h2>
+
+<h3 id="q1">Q1: CLIP 和 SigLIP 的核心区别？</h3>
+
+<table>
+    <tr><th>维度</th><th>CLIP</th><th>SigLIP</th></tr>
+    <tr><td>Loss</td><td>Softmax InfoNCE (N-way 分类)</td><td>Sigmoid 二分类 (per-pair)</td></tr>
+    <tr><td>Batch 依赖</td><td>需要大 batch (32K+)</td><td>小 batch 也可</td></tr>
+    <tr><td>分布式训练</td><td>需 all-gather 全局 softmax</td><td>无需跨设备通信</td></tr>
+    <tr><td>内存</td><td>O(N²) 相似度矩阵</td><td>O(N) per-pair</td></tr>
+    <tr><td>稳定性</td><td>τ 敏感</td><td>更稳定</td></tr>
+</table>
+
+<pre><code># CLIP Loss
+logits = image_embeds @ text_embeds.T * exp(log_temperature)  # NxN
+labels = torch.arange(N)
+loss = (F.cross_entropy(logits, labels) + F.cross_entropy(logits.T, labels)) / 2
+
+# SigLIP Loss
+logits = image_embeds @ text_embeds.T * exp(log_temperature) + bias
+labels = 2 * torch.eye(N) - 1  # +1 匹配, -1 不匹配
+loss = -F.logsigmoid(labels * logits).sum() / N</code></pre>
+
+<h3 id="q2">Q2: LLaVA 训练流水线详解</h3>
+
+<table>
+    <tr><th>版本</th><th>架构</th><th>关键改进</th></tr>
+    <tr><td>LLaVA-1.0</td><td>CLIP-ViT-L/14 → Linear → Vicuna</td><td>开创性 visual instruction tuning</td></tr>
+    <tr><td>LLaVA-1.5</td><td>CLIP@336px → 2-layer MLP → Vicuna-1.5</td><td>MLP > 复杂 connector；加入 VQA 数据</td></tr>
+    <tr><td>LLaVA-NeXT</td><td>AnyRes tiling + 更强 LLM</td><td>动态高分辨率 + 1.2M 数据</td></tr>
+    <tr><td>LLaVA-OneVision</td><td>SigLIP-SO400M + Qwen2</td><td>统一 image/video/multi-image</td></tr>
+</table>
+
+<div class="card key-point">
+    <h4>核心 Takeaway</h4>
+    <p>LLaVA 的成功证明：<strong>简单 MLP + 高质量数据</strong> 可以打败复杂架构设计。这是"less is more"的有力证据。</p>
+</div>
+
+<h3 id="q3">Q3: Visual Connector 的作用？为什么 MLP 就够了？</h3>
+
+<p><strong>三个核心功能</strong>：维度对齐 (ViT dim → LLM dim)、模态桥接、Token 压缩（可选）</p>
+
+<p><strong>为什么简单 MLP 就够</strong>：当 ViT 和 LLM 都是强预训练模型时，projector 只需做"翻译"。Q-Former 等复杂设计可能因 query 数量不足而成为信息瓶颈。对需要细粒度空间理解的任务 (OCR, grounding)，保留全部 token 的 MLP 更优。</p>
+
+<h3 id="q4">Q4: VLM 如何处理高分辨率图像？</h3>
+
+<p><strong>核心挑战</strong>: ViT 注意力 O(n²)，分辨率翻倍则 patch 数翻 4 倍。</p>
+
+<pre><code># Dynamic Tiling (AnyRes) - 主流方案
+def tile_image(image, base_res=336, max_tiles=12):
+    cols, rows = find_best_grid(W, H, base_res, max_tiles)
+    resized = resize(image, (rows*base_res, cols*base_res))
+    tiles = split_into_grid(resized, cols, rows)
+    thumbnail = resize(image, (base_res, base_res))
+    return tiles + [thumbnail]  # 每个独立编码后拼接</code></pre>
+
+<p><strong>Qwen2-VL 方案</strong>：2D-RoPE + Spatial Merge (2×2→1)，无需 tiling。</p>
+
+<h3 id="q5">Q5: Visual Grounding 如何实现？</h3>
+
+<pre><code># 主流方法：坐标 Token 化
+User: 图中的狗在哪里？
+Model: &lt;box&gt;(234, 156, 567, 489)&lt;/box&gt;
+# 坐标归一化到 [0, 1000]，LLM 自回归生成</code></pre>
+
+<p>训练数据：RefCOCO, Visual Genome。挑战：坐标幻觉、多相似物体歧义。</p>
+
+<h3 id="q6">Q6: MoE 如何应用于 VLM？</h3>
+
+<pre><code>Input Token → Router → Top-K 专家 → 加权求和</code></pre>
+
+<p>核心优势：3-7× 参数只用 1.5-2× 计算。VLM 特有挑战：视觉 token 导致负载不均衡、需要模态平衡的辅助 loss。</p>
+
+<h3 id="q7">Q7: 视频理解的核心挑战？</h3>
+
+<table>
+    <tr><th>挑战</th><th>原因</th></tr>
+    <tr><td>时序建模</td><td>ViT 处理静态图像，缺乏时间归纳偏置</td></tr>
+    <tr><td>Token 爆炸</td><td>30fps × 10s = 300帧 × 256 = 76,800 tokens</td></tr>
+    <tr><td>时序推理弱</td><td>排序、因果、持续时间估计仍困难</td></tr>
+</table>
+
+<p><strong>方案</strong>：均匀采样、关键帧选择、时序池化、Dynamic FPS (Qwen2.5-VL)、分层编码。长视频前沿：Agentic 方法 + Temporal CoT。</p>
+
+<h3 id="q8">Q8: VLM 的 RLHF/DPO 与纯文本有何不同？</h3>
+
+<div class="card warning">
+    <h4>VLM 特有挑战</h4>
+    <ul>
+        <li><strong>视觉幻觉</strong>是核心失败模式，比文本错误更难检测</li>
+        <li>偏好数据成本 <strong>高 3-5×</strong>（标注员需对照图像判断）</li>
+        <li>Reward Model 需要视觉能力（纯文本 RM 无法判断视觉忠实性）</li>
+        <li>粒度问题：回答可能部分正确（物体对但关系错）</li>
+    </ul>
+</div>
+
+<p>最新方法：OPA-DPO, S2H-DPO, RA-DPO, POVID</p>
+
+<h3 id="q9">Q9: 如何减少 VLM 幻觉？</h3>
+
+<table>
+    <tr><th>阶段</th><th>方法</th></tr>
+    <tr><td>训练时</td><td>高质量数据、负样本、对比训练、DPO/RLHF、Grounding 监督</td></tr>
+    <tr><td>推理时</td><td>Contrastive Decoding (VCD)、OPERA、DoLa、CoT、Self-verify</td></tr>
+    <tr><td>架构层</td><td>高分辨率、保留空间 token、多尺度特征</td></tr>
+</table>
+
+<pre><code># Contrastive Decoding 核心思想
+logits_final = logits_with_image - α * logits_without_image
+# 惩罚不看图也能生成的 token（文本先验偏置）</code></pre>
+
+<h3 id="q10">Q10: 设计多模态 RAG 系统</h3>
+
+<div class="diagram">┌─────────────────────────────────────┐
+│         Query Processing            │
+│  用户查询 → 查询分析 → 多模态编码    │
+└──────────────┬──────────────────────┘
+               ↓
+┌─────────────────────────────────────┐
+│       Multi-Modal Retrieval         │
+│  Text (BM25+Dense) + Visual (CLIP)  │
+│         → Hybrid Re-ranking         │
+└──────────────┬──────────────────────┘
+               ↓
+┌─────────────────────────────────────┐
+│       Context Assembly              │
+│  检索文本 + 图像 + 元数据           │
+└──────────────┬──────────────────────┘
+               ↓
+┌─────────────────────────────────────┐
+│       VLM Generation                │
+│  多模态上下文 → VLM → 带引用的回答   │
+└─────────────────────────────────────┘</div>
+
+<p><strong>关键点</strong>：ColPali/ColQwen per-patch 检索、混合检索 scoring、强制引用来源减少幻觉。</p>
+
+<h3 id="q11">Q11: 如何高效部署 VLM？</h3>
+
+<table>
+    <tr><th>优化方向</th><th>方法</th></tr>
+    <tr><td>Visual Encoding</td><td>Embedding 缓存、Batch 编码、Tile 并行</td></tr>
+    <tr><td>KV-Cache</td><td>PagedAttention (vLLM)、推理 Token 剪枝 (FastV)</td></tr>
+    <tr><td>模型优化</td><td>INT4/INT8 量化 (GPTQ, AWQ)、Flash Attention</td></tr>
+    <tr><td>Serving</td><td>vLLM、SGLang (RadixAttention)、TensorRT-LLM</td></tr>
+    <tr><td>成本优化</td><td>路由策略 (简单→7B, 复杂→70B+)、自适应分辨率</td></tr>
+</table>
+
+<!-- Section 4 -->
+<h2 id="sec4">四、代码实现题</h2>
+
+<h3 id="code1">4.1 实现 Visual Projector</h3>
+
+<pre><code>import torch
+import torch.nn as nn
+
+class MLPProjector(nn.Module):
+    """LLaVA-style 2-layer MLP projector."""
+    def __init__(self, visual_dim: int, llm_dim: int, hidden_dim: int = None):
+        super().__init__()
+        hidden_dim = hidden_dim or llm_dim
+        self.projector = nn.Sequential(
+            nn.Linear(visual_dim, hidden_dim),
+            nn.GELU(),
+            nn.Linear(hidden_dim, llm_dim),
+        )
+
+    def forward(self, visual_features: torch.Tensor) -> torch.Tensor:
+        # (batch, num_patches, visual_dim) → (batch, num_patches, llm_dim)
+        return self.projector(visual_features)
+
+
+class PerceiverResampler(nn.Module):
+    """Flamingo-style: 变长视觉特征 → 固定 num_latents 个 token"""
+    def __init__(self, visual_dim, llm_dim, num_latents=64, num_heads=16, num_layers=6):
+        super().__init__()
+        self.latents = nn.Parameter(torch.randn(num_latents, llm_dim) * 0.02)
+        self.input_proj = nn.Linear(visual_dim, llm_dim)
+        self.layers = nn.ModuleList([
+            PerceiverLayer(llm_dim, num_heads) for _ in range(num_layers)
+        ])
+        self.norm = nn.LayerNorm(llm_dim)
+
+    def forward(self, visual_features):
+        B = visual_features.shape[0]
+        x = self.input_proj(visual_features)
+        latents = self.latents.unsqueeze(0).expand(B, -1, -1)
+        for layer in self.layers:
+            latents = layer(latents, x)
+        return self.norm(latents)
+
+
+class PerceiverLayer(nn.Module):
+    def __init__(self, dim, num_heads):
+        super().__init__()
+        self.self_attn = nn.MultiheadAttention(dim, num_heads, batch_first=True)
+        self.cross_attn = nn.MultiheadAttention(dim, num_heads, batch_first=True)
+        self.ffn = nn.Sequential(nn.Linear(dim, dim*4), nn.GELU(), nn.Linear(dim*4, dim))
+        self.norm1 = nn.LayerNorm(dim)
+        self.norm2 = nn.LayerNorm(dim)
+        self.norm3 = nn.LayerNorm(dim)
+
+    def forward(self, latents, context):
+        x = self.norm1(latents)
+        latents = latents + self.self_attn(x, x, x)[0]
+        x = self.norm2(latents)
+        latents = latents + self.cross_attn(x, context, context)[0]
+        latents = latents + self.ffn(self.norm3(latents))
+        return latents</code></pre>
+
+<h3 id="code2">4.2 交错图文输入的 Attention Mask</h3>
+
+<pre><code>import torch
+from typing import List
+
+def create_interleaved_attention_mask(
+    seq_len: int,
+    image_regions: List[tuple],  # [(start, end), ...]
+    dtype=torch.float32,
+) -> torch.Tensor:
+    """
+    规则:
+    1. 整体 causal mask（每个 token 只能看前面的）
+    2. 同一图像内 token 双向注意
+    3. 不同图像 token 不能直接注意
+    """
+    # 标准下三角 causal mask
+    causal = torch.tril(torch.ones(seq_len, seq_len, dtype=torch.bool))
+    
+    # 同一图像内允许双向注意
+    for start, end in image_regions:
+        causal[start:end, start:end] = True
+    
+    # 转为 float: 0=可注意, -inf=mask
+    mask = torch.zeros(seq_len, seq_len, dtype=dtype)
+    mask.masked_fill_(~causal, float('-inf'))
+    
+    return mask.unsqueeze(0).unsqueeze(0)  # (1, 1, seq_len, seq_len)
+
+# 使用示例:
+# 序列: [text:10] [image_0:256] [text:15] [image_1:256] [text:20]
+mask = create_interleaved_attention_mask(557, [(10, 266), (281, 537)])</code></pre>
+
+<h3 id="code3">4.3 图像 Tiling（高分辨率输入）</h3>
+
+<pre><code>import torch
+import torch.nn.functional as F
+import math
+
+def find_best_grid(width, height, base_res=336, max_tiles=12):
+    """找到最匹配宽高比的网格配置"""
+    aspect = width / height
+    best_grid, best_score = (1, 1), float('inf')
+    
+    for total in range(1, max_tiles + 1):
+        for cols in range(1, total + 1):
+            rows = total // cols
+            if rows * cols != total or rows == 0:
+                continue
+            score = abs(math.log(cols/rows) - math.log(aspect)) + 0.01 * total
+            if score < best_score:
+                best_score = score
+                best_grid = (cols, rows)
+    return best_grid
+
+def tile_image(image: torch.Tensor, base_res=336, max_tiles=12):
+    """
+    Args: image (C, H, W)
+    Returns: tiles (N+1, C, base_res, base_res), grid (cols, rows)
+    """
+    C, H, W = image.shape
+    cols, rows = find_best_grid(W, H, base_res, max_tiles)
+    
+    # Resize to fit grid
+    resized = F.interpolate(
+        image.unsqueeze(0), (rows*base_res, cols*base_res),
+        mode='bicubic', align_corners=False
+    ).squeeze(0)
+    
+    # Split into tiles
+    tiles = []
+    for r in range(rows):
+        for c in range(cols):
+            tiles.append(resized[:, r*base_res:(r+1)*base_res, c*base_res:(c+1)*base_res])
+    
+    # Thumbnail (全局视图)
+    thumb = F.interpolate(image.unsqueeze(0), (base_res, base_res),
+                          mode='bicubic', align_corners=False).squeeze(0)
+    tiles.append(thumb)
+    
+    return torch.stack(tiles), (cols, rows)
+
+# Example
+image = torch.randn(3, 1920, 1080)
+tiles, grid = tile_image(image)
+print(f"Grid: {grid[0]}×{grid[1]}, Total tiles: {tiles.shape[0]}")
+# Grid: 3×5, Total tiles: 16 (15 tiles + 1 thumbnail)</code></pre>
+
+<!-- Section 5 -->
+<h2 id="sec5">五、必知论文清单</h2>
+
+<table>
+    <tr><th>论文</th><th>核心贡献</th><th>年份</th></tr>
+    <tr><td>LLaVA</td><td>开创性 visual instruction tuning</td><td>2023</td></tr>
+    <tr><td>LLaVA-1.5</td><td>MLP > 复杂 connector 的实证</td><td>2023</td></tr>
+    <tr><td>BLIP-2</td><td>Q-Former 连接器设计</td><td>2023</td></tr>
+    <tr><td>LLaVA-NeXT</td><td>AnyRes 动态分辨率</td><td>2024</td></tr>
+    <tr><td>InternVL 2/2.5</td><td>6B ViT, progressive training</td><td>2024</td></tr>
+    <tr><td>Qwen2-VL</td><td>Native Dynamic Resolution + M-RoPE</td><td>2024</td></tr>
+    <tr><td>LLaVA-OneVision</td><td>统一 image/video/multi-image</td><td>2024</td></tr>
+    <tr><td>Cambrian-1</td><td>Connector 消融, 多编码器</td><td>2024</td></tr>
+    <tr><td>DeepSeek-VL2</td><td>MoE + VLM</td><td>2024</td></tr>
+    <tr><td><strong>Qwen3-VL</strong></td><td>Interleaved-MRoPE, DeepStack</td><td>2025</td></tr>
+    <tr><td><strong>InternVL3.5</strong></td><td>Cascade RL, MMMU 77.7%</td><td>2025</td></tr>
+    <tr><td>OPA-DPO (CVPR 2025)</td><td>针对幻觉的对齐方法</td><td>2025</td></tr>
+    <tr><td>NaViL (ICCV 2025)</td><td>Native MLLM Scaling Laws</td><td>2025</td></tr>
+    <tr><td>GR3D (CVPR 2026)</td><td>3D Spatial VLM</td><td>2026</td></tr>
+</table>
+
+<!-- Section 6 -->
+<h2 id="sec6">六、面试准备要点总结</h2>
+
+<div class="card">
+    <h4>八大核心知识点</h4>
+    <ol>
+        <li><strong>架构</strong>：ViT-Connector-LLM vs 原生多模态，MoE 应用</li>
+        <li><strong>动态分辨率</strong>：Tiling (AnyRes)、Native Resolution (2D-RoPE)、Token 压缩</li>
+        <li><strong>训练</strong>：多阶段 PT→SFT→RL，GRPO/DPO for VLM，Thinking 变体</li>
+        <li><strong>Scaling</strong>：ViT 比 LLM 更快饱和，MoE 比 Dense 更高效</li>
+        <li><strong>推理+视觉</strong>：o 系列 "thinking with images" 范式</li>
+        <li><strong>效率</strong>：Token 压缩、MoE、小模型 (SmolVLM, Moondream) 是部署关键</li>
+        <li><strong>Agent + 具身</strong>：VLM as GUI Agent / 机器人感知骨干</li>
+        <li><strong>开源追平闭源</strong>：MMMU 差距仅 1-2%</li>
+    </ol>
+</div>
+
+</main>
+
+<script>
+// Smooth scroll for TOC links
+document.querySelectorAll('.sidebar a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Close mobile sidebar
+        document.querySelector('.sidebar').classList.remove('open');
+    });
+});
+
+// Active TOC highlight on scroll
+const sections = document.querySelectorAll('h2[id], h3[id]');
+const tocLinks = document.querySelectorAll('.sidebar a');
+
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        if (window.scrollY >= sectionTop) {
+            current = section.getAttribute('id');
+        }
+    });
+    tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+
+</body>
+</html>
