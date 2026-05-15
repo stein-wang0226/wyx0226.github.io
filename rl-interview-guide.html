@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>强化学习面试速查手册</title>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --primary-dark: #1e40af;
+            --accent: #f59e0b;
+            --accent-light: #fef3c7;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --purple: #7c3aed;
+            --purple-light: #ede9fe;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', 'PingFang SC', sans-serif;
+            line-height: 1.85;
+            color: var(--gray-800);
+            background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 40px 28px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 64px 0 48px;
+            margin-bottom: 48px;
+        }
+
+        header h1 {
+            font-size: 2.6rem;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        header .subtitle {
+            font-size: 1.1rem;
+            color: var(--gray-600);
+            margin-bottom: 24px;
+        }
+
+        header .tags {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        header .tags span {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .tag-blue { background: var(--primary-light); color: var(--primary-dark); }
+        .tag-amber { background: var(--accent-light); color: #92400e; }
+        .tag-green { background: var(--success-light); color: #065f46; }
+        .tag-purple { background: var(--purple-light); color: #5b21b6; }
+
+        /* TOC */
+        nav.toc {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 32px 36px;
+            margin-bottom: 56px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        nav.toc h2 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        nav.toc ol {
+            padding-left: 20px;
+            columns: 2;
+            column-gap: 32px;
+        }
+
+        nav.toc li {
+            margin-bottom: 10px;
+            break-inside: avoid;
+        }
+
+        nav.toc a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav.toc a:hover { color: var(--primary-dark); text-decoration: underline; }
+
+        /* Sections */
+        section {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 36px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid var(--gray-100);
+        }
+
+        h2 {
+            font-size: 1.7rem;
+            color: var(--gray-900);
+            margin-bottom: 28px;
+            padding-bottom: 14px;
+            border-bottom: 3px solid var(--primary);
+            letter-spacing: -0.3px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: var(--gray-900);
+            margin-top: 36px;
+            margin-bottom: 16px;
+            padding-left: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        h4 {
+            font-size: 1.05rem;
+            color: var(--gray-700);
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        p { margin-bottom: 14px; font-size: 0.98rem; }
+
+        /* Formula boxes */
+        .formula-box {
+            background: linear-gradient(135deg, #f8fbff, #f0f7ff);
+            border: 1px solid var(--primary-light);
+            border-left: 5px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 22px 26px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .formula-box.highlight {
+            background: linear-gradient(135deg, #fffcf0, #fff8e1);
+            border-left-color: var(--accent);
+            border-color: var(--accent-light);
+        }
+
+        .formula-box.key {
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            border-left-color: var(--success);
+            border-color: #bbf7d0;
+        }
+
+        .formula-box .label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+
+        .formula-box.highlight .label { color: #92400e; }
+        .formula-box.key .label { color: #065f46; }
+
+        .formula-annotation {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--gray-300);
+            font-size: 0.9rem;
+            color: var(--gray-700);
+        }
+
+        .formula-annotation .item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .formula-annotation .symbol {
+            flex-shrink: 0;
+            font-weight: 600;
+            color: var(--gray-900);
+            min-width: 100px;
+        }
+
+        /* Insight/Warning boxes */
+        .box-insight, .box-warning, .box-interview, .box-analogy {
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            margin: 20px 0;
+            font-size: 0.94rem;
+        }
+
+        .box-insight {
+            background: var(--success-light);
+            border-left: 5px solid var(--success);
+        }
+        .box-insight::before { content: "💡 直觉理解"; font-weight: 700; display: block; margin-bottom: 8px; color: #065f46; }
+
+        .box-warning {
+            background: var(--danger-light);
+            border-left: 5px solid var(--danger);
+        }
+        .box-warning::before { content: "⚠️ 面试易错点"; font-weight: 700; display: block; margin-bottom: 8px; color: #991b1b; }
+
+        .box-interview {
+            background: #eff6ff;
+            border-left: 5px solid var(--primary);
+        }
+        .box-interview::before { content: "🎤 30秒面试回答"; font-weight: 700; display: block; margin-bottom: 8px; color: var(--primary-dark); }
+
+        .box-analogy {
+            background: var(--purple-light);
+            border-left: 5px solid var(--purple);
+        }
+        .box-analogy::before { content: "🎯 类比"; font-weight: 700; display: block; margin-bottom: 8px; color: #5b21b6; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        th {
+            background: var(--gray-900);
+            color: white;
+            padding: 13px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: top;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background: var(--gray-50); }
+
+        /* Cards */
+        .step-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .step-card h4 {
+            margin-top: 0;
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+        }
+
+        .step-card .step-number {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Evolution diagram */
+        .evolution {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            margin: 32px 0;
+        }
+
+        .evo-node {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 14px 24px;
+            text-align: center;
+            width: 320px;
+            position: relative;
+        }
+
+        .evo-node .name { font-weight: 700; color: var(--gray-900); font-size: 1rem; }
+        .evo-node .desc { font-size: 0.82rem; color: var(--gray-600); margin-top: 4px; }
+
+        .evo-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 0;
+            color: var(--gray-600);
+            font-size: 0.78rem;
+        }
+
+        .evo-arrow::before { content: "↓"; font-size: 1.2rem; color: var(--primary); }
+
+        /* ASCII art */
+        .ascii-diagram {
+            background: var(--gray-900);
+            color: #a5f3fc;
+            padding: 24px 28px;
+            border-radius: var(--radius);
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+            margin: 20px 0;
+        }
+
+        /* Comparison grid */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .comparison-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+        }
+
+        .comparison-card h5 {
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+            font-size: 0.95rem;
+        }
+
+        .comparison-card p {
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+        }
+
+        /* Symbol reference quick cards */
+        .symbol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .symbol-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .symbol-card .sym {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .symbol-card .meaning {
+            font-size: 0.85rem;
+            color: var(--gray-700);
+        }
+
+        .symbol-card .meaning strong {
+            color: var(--gray-900);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 48px 0 32px;
+            color: var(--gray-600);
+            font-size: 0.88rem;
+        }
+
+        footer a { color: var(--primary); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 20px 16px; }
+            section { padding: 28px 20px; }
+            header h1 { font-size: 1.9rem; }
+            h2 { font-size: 1.4rem; }
+            nav.toc ol { columns: 1; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .symbol-grid { grid-template-columns: 1fr; }
+            .evo-node { width: 260px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<header>
+    <h1>强化学习面试速查手册</h1>
+    <p class="subtitle">从策略梯度到 PPO/GRPO/DPO，公式逐项拆解 + 直觉理解</p>
+    <div class="tags">
+        <span class="tag-blue">Policy Gradient</span>
+        <span class="tag-amber">PPO / GRPO</span>
+        <span class="tag-green">RLHF / DPO</span>
+        <span class="tag-purple">面试高频题</span>
+    </div>
+</header>
+
+<nav class="toc">
+    <h2>📑 目录</h2>
+    <ol>
+        <li><a href="#symbols">符号系统完全手册</a></li>
+        <li><a href="#core-concepts">核心概念与公式</a></li>
+        <li><a href="#pg-to-ppo">策略梯度到 PPO 演进</a></li>
+        <li><a href="#ppo-detail">PPO 完全详解</a></li>
+        <li><a href="#grpo">GRPO 详解</a></li>
+        <li><a href="#rlvr">RLVR 范式详解</a></li>
+        <li><a href="#rlhf">RLHF 完整流程</a></li>
+        <li><a href="#dpo">DPO 公式推导</a></li>
+        <li><a href="#reward">Reward 设计方法论</a></li>
+        <li><a href="#comparison">算法对比总结</a></li>
+        <li><a href="#faq">高频面试问答</a></li>
+    </ol>
+</nav>
+
+<!-- ==================== Section 1: Symbols ==================== -->
+<section id="symbols">
+    <h2>1. 符号系统完全手册</h2>
+    <p>RL 论文中符号混乱且不统一，这里做一份<strong>权威参照表</strong>。后续所有公式均基于此处定义。</p>
+
+    <h3>第一层：环境与交互基础</h3>
+    <table>
+        <tr><th>符号</th><th>读法</th><th>含义</th><th>举例</th></tr>
+        <tr><td>$s$ 或 $s_t$</td><td>state</td><td>时刻 $t$ 的状态</td><td>棋盘局面 / 已生成的 token 序列</td></tr>
+        <tr><td>$a$ 或 $a_t$</td><td>action</td><td>时刻 $t$ 的动作</td><td>落子位置 / 生成下一个 token</td></tr>
+        <tr><td>$r_t$</td><td>reward</td><td>时刻 $t$ 的即时奖励（标量）</td><td>这一步得 +1 分</td></tr>
+        <tr><td>$\gamma$</td><td>gamma</td><td>折扣因子 $\in[0,1)$</td><td>0.99 = 很看重未来</td></tr>
+        <tr><td>$\tau$</td><td>trajectory</td><td>一条完整轨迹</td><td>$(s_0,a_0,r_0,s_1,a_1,r_1,\ldots)$</td></tr>
+        <tr><td>$T$</td><td>terminal</td><td>轨迹终止时刻</td><td>一局游戏结束</td></tr>
+    </table>
+
+    <h3>第二层：回报（Return）</h3>
+    <table>
+        <tr><th>符号</th><th>含义</th><th>公式</th><th>直觉</th></tr>
+        <tr><td>$G_t$</td><td>从 $t$ 开始的累积折扣回报</td><td>$G_t = \sum_{k=0}^{T-t-1}\gamma^k r_{t+k}$</td><td>"从现在起，未来总共能拿多少分"</td></tr>
+        <tr><td>$R(\tau)$</td><td>整条轨迹的总回报</td><td>$\sum_{t=0}^{T-1}r_t$ 或 $G_0$</td><td>"这一局的总成绩"</td></tr>
+    </table>
+
+    <div class="box-insight">
+        $r_t$ 是一帧的分数，$G_t$ 是剩余部分的加权总分，$R(\tau)$ 是一局的总分。关系：$G_0 = r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots$
+    </div>
+
+    <h3>第三层：价值函数</h3>
+    <table>
+        <tr><th>符号</th><th>名称</th><th>公式</th><th>直觉</th></tr>
+        <tr><td>$V^\pi(s)$</td><td>状态价值函数</td><td>$\mathbb{E}_\pi[G_t|s_t=s]$</td><td>"在状态 $s$，按策略 $\pi$ 走，<strong>平均</strong>能拿多少总分"</td></tr>
+        <tr><td>$Q^\pi(s,a)$</td><td>动作价值函数</td><td>$\mathbb{E}_\pi[G_t|s_t=s,a_t=a]$</td><td>"在 $s$ 做了 $a$，之后按 $\pi$ 走，平均总分"</td></tr>
+        <tr><td>$A^\pi(s,a)$</td><td>优势函数 (Advantage)</td><td>$Q(s,a) - V(s)$</td><td>"动作 $a$ 比该状态的平均水平好多少"</td></tr>
+    </table>
+
+    <div class="ascii-diagram">
+Q(s,a) = V(s) + A(s,a)
+
+V(s) ─── "这个状态所有动作的平均水平"
+Q(s,a) ─ "做这个具体动作的预期得分"
+A(s,a) ─ "这个动作相对平均的增量"
+
+A > 0 → 好动作（比平均好）
+A < 0 → 坏动作（比平均差）
+A = 0 → 和平均水平一样</div>
+
+    <h3>第四层：策略相关</h3>
+    <table>
+        <tr><th>符号</th><th>含义</th><th>直觉</th></tr>
+        <tr><td>$\pi$</td><td>策略（给定状态 → 输出动作的规则）</td><td>agent 的"大脑"</td></tr>
+        <tr><td>$\pi_\theta(a|s)$</td><td>参数 $\theta$ 的策略在状态 $s$ 选动作 $a$ 的概率</td><td>神经网络的 softmax 输出</td></tr>
+        <tr><td>$\theta$</td><td>策略网络的参数（权重）</td><td>我们要优化的变量</td></tr>
+        <tr><td>$J(\theta)$</td><td>目标函数 = 策略的期望总回报</td><td>$\mathbb{E}[R(\tau)]$，越大越好</td></tr>
+        <tr><td>$\nabla_\theta$</td><td>对 $\theta$ 求梯度</td><td>参数应往哪个方向调</td></tr>
+    </table>
+
+    <h3>第五层：PPO 专用</h3>
+    <table>
+        <tr><th>符号</th><th>含义</th><th>直觉</th></tr>
+        <tr><td>$\pi_{\theta_{old}}$</td><td>旧策略（采数据时的版本）</td><td>"上一版模型"</td></tr>
+        <tr><td>$r_t(\theta)$</td><td>概率比 $= \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$</td><td>"新策略对这个动作的喜好变化倍数"</td></tr>
+        <tr><td>$\epsilon$</td><td>clip 范围（0.1~0.2）</td><td>"允许新旧策略最多差多远"</td></tr>
+        <tr><td>$\delta_t$</td><td>TD 误差 $= r_t + \gamma V(s_{t+1}) - V(s_t)$</td><td>"实际比预期好/差多少"</td></tr>
+        <tr><td>$\lambda$</td><td>GAE 衰减系数（0.95）</td><td>"看多远的未来信息"</td></tr>
+    </table>
+
+    <div class="box-warning">
+        <strong>最易混淆的两个 $r$：</strong><br>
+        $r_t$（不带 $\theta$）= 时刻 $t$ 的即时<strong>奖励</strong><br>
+        $r_t(\theta)$（带 $\theta$）= PPO 中的<strong>概率比</strong><br>
+        有些论文用 $\rho_t(\theta)$ 表示概率比来避免歧义。
+    </div>
+
+    <h3>第六层：RLHF / DPO 专用</h3>
+    <table>
+        <tr><th>符号</th><th>含义</th><th>直觉</th></tr>
+        <tr><td>$x$</td><td>prompt（用户输入）</td><td>问题/指令</td></tr>
+        <tr><td>$y$</td><td>response（模型输出）</td><td>生成的回答</td></tr>
+        <tr><td>$y_w$</td><td>winning response</td><td>人类偏好的好回答</td></tr>
+        <tr><td>$y_l$</td><td>losing response</td><td>人类不偏好的差回答</td></tr>
+        <tr><td>$\pi_{ref}$</td><td>参考策略（冻结的 SFT 模型）</td><td>"锚点"——不能偏太远</td></tr>
+        <tr><td>$r(x,y)$</td><td>Reward Model 的打分</td><td>回答质量的数值评估</td></tr>
+        <tr><td>$\beta$</td><td>KL 约束强度</td><td>越大越保守，越小越激进</td></tr>
+        <tr><td>$\sigma(\cdot)$</td><td>sigmoid 函数</td><td>$\frac{1}{1+e^{-z}}$，映射到 (0,1)</td></tr>
+        <tr><td>$D_{KL}$</td><td>KL 散度</td><td>两个分布的"距离"</td></tr>
+    </table>
+
+    <h3>第七层：GRPO 专用</h3>
+    <table>
+        <tr><th>符号</th><th>含义</th><th>直觉</th></tr>
+        <tr><td>$G$</td><td>group size（组大小，通常 64）</td><td>同一 prompt 采样几条回答</td></tr>
+        <tr><td>$\{y_1,\ldots,y_G\}$</td><td>一组回答</td><td>对同一题的多次作答</td></tr>
+        <tr><td>$r_i$</td><td>第 $i$ 个回答的 reward 得分</td><td>RM 或规则给的分数</td></tr>
+        <tr><td>$\hat{A}_i$</td><td>第 $i$ 个回答的 advantage</td><td>组内标准化后的相对好坏</td></tr>
+    </table>
+
+    <h3>符号混淆速查</h3>
+    <table>
+        <tr><th>容易混淆</th><th>如何区分</th></tr>
+        <tr><td>$r_t$（奖励）vs $r_t(\theta)$（概率比）</td><td>带 $(\theta)$ 是概率比</td></tr>
+        <tr><td>$R(\tau)$（总回报）vs $r(x,y)$（RM 打分）</td><td>大写 $R$ 是轨迹总和</td></tr>
+        <tr><td>$G_t$（累积回报）vs $G$（组大小）</td><td>$G_t$ 有下标 $t$</td></tr>
+        <tr><td>$\gamma$（折扣因子）vs $\lambda$（GAE 衰减）</td><td>$\gamma$ 属于 MDP，$\lambda$ 属于 GAE</td></tr>
+        <tr><td>$\epsilon$（clip）vs $\epsilon$（探索率）</td><td>看上下文：PPO 是 clip，DQN 是探索</td></tr>
+        <tr><td>$V(s)$（真值）vs $V_\phi(s)$（Critic 网络）</td><td>带 $\phi$ 是神经网络近似</td></tr>
+    </table>
+</section>
+
+<!-- ==================== Section 2: Core Concepts ==================== -->
+<section id="core-concepts">
+    <h2>2. 核心概念与公式</h2>
+
+    <h3>MDP 五元组</h3>
+    <div class="formula-box">
+        <div class="label">定义</div>
+        $$\text{MDP} = (S, A, P, R, \gamma)$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$S$</span>状态空间——agent 能观察到的所有环境信息的集合</div>
+            <div class="item"><span class="symbol">$A$</span>动作空间——agent 能做的所有选择的集合</div>
+            <div class="item"><span class="symbol">$P(s'|s,a)$</span>转移概率——做了动作 $a$ 后，环境从 $s$ 变到 $s'$ 的概率</div>
+            <div class="item"><span class="symbol">$R(s,a)$</span>奖励函数——执行动作后的即时反馈</div>
+            <div class="item"><span class="symbol">$\gamma$</span>折扣因子——未来奖励的衰减系数</div>
+        </div>
+    </div>
+
+    <div class="box-analogy">
+        MDP 就像一个棋盘游戏的规则书：$S$ 是所有可能的棋盘局面，$A$ 是你能走的棋步，$P$ 是走了之后棋盘怎么变，$R$ 是每步得多少分，$\gamma$ 是你对"以后的分"打多少折扣。
+    </div>
+
+    <h3>Bellman 方程</h3>
+    <div class="formula-box key">
+        <div class="label">递归关系</div>
+        $$V^\pi(s) = \sum_a \pi(a|s) \left[R(s,a) + \gamma \sum_{s'} P(s'|s,a)\, V^\pi(s')\right]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\pi(a|s)$</span>策略在状态 $s$ 下选动作 $a$ 的概率</div>
+            <div class="item"><span class="symbol">$R(s,a)$</span>这一步的即时奖励</div>
+            <div class="item"><span class="symbol">$\gamma V^\pi(s')$</span>下一步状态价值的折扣</div>
+        </div>
+    </div>
+
+    <div class="box-insight">
+        Bellman 方程说的是：<strong>当前价值 = 即时奖励 + 未来价值的折扣期望</strong>。这是一个递归定义——一个状态的好坏取决于下一个状态的好坏，像多米诺骨牌一样一环扣一环。
+    </div>
+</section>
+
+<!-- ==================== Section 3: PG to PPO ==================== -->
+<section id="pg-to-ppo">
+    <h2>3. 策略梯度到 PPO 演进</h2>
+
+    <h3>演进路线图</h3>
+    <div class="evolution">
+        <div class="evo-node">
+            <div class="name">REINFORCE</div>
+            <div class="desc">直接用回报加权梯度</div>
+        </div>
+        <div class="evo-arrow">问题：方差太大，学习不稳定</div>
+        <div class="evo-node">
+            <div class="name">+ Baseline → Advantage Actor-Critic</div>
+            <div class="desc">引入价值函数做基准，训练 Critic 网络</div>
+        </div>
+        <div class="evo-arrow">问题：梯度步长敏感，策略容易崩溃</div>
+        <div class="evo-node">
+            <div class="name">TRPO</div>
+            <div class="desc">KL 散度约束，信任域优化</div>
+        </div>
+        <div class="evo-arrow">问题：需要二阶优化，实现复杂</div>
+        <div class="evo-node" style="border-color: var(--accent); border-width: 3px;">
+            <div class="name">PPO</div>
+            <div class="desc">clip 代替 KL，一阶优化，简单高效</div>
+        </div>
+    </div>
+
+    <p>每一步都解决上一步的核心缺陷。面试中讲清这条因果链比背公式更有价值。</p>
+
+    <!-- REINFORCE -->
+    <h3>Step 1: REINFORCE</h3>
+
+    <h4>目标</h4>
+    <p>找到参数 $\theta$，使策略 $\pi_\theta$ 的期望总回报 $J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)]$ 最大。</p>
+
+    <h4>核心推导：Log-Derivative Trick</h4>
+    <p>轨迹的概率为：</p>
+    <div class="formula-box">
+        $$P(\tau|\theta) = p(s_0) \prod_{t=0}^{T-1} \underbrace{\pi_\theta(a_t|s_t)}_{\text{策略（和 }\theta\text{ 有关）}} \cdot \underbrace{p(s_{t+1}|s_t,a_t)}_{\text{环境动力学（和 }\theta\text{ 无关）}}$$
+    </div>
+    <p>取 log 再对 $\theta$ 求导，环境动力学项消失，只剩策略部分：</p>
+
+    <div class="formula-box highlight">
+        <div class="label">REINFORCE 梯度公式</div>
+        $$\nabla_\theta J = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G_t\right]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\nabla_\theta \log \pi_\theta(a_t|s_t)$</span>"增大动作 $a_t$ 出现概率"的梯度方向。告诉参数往哪调能让这个动作更可能被选中</div>
+            <div class="item"><span class="symbol">$G_t$</span>从这步开始的累积回报。作为<strong>权重</strong>：回报高 → 大力增大该动作概率；回报低 → 轻微增大甚至反向</div>
+            <div class="item"><span class="symbol">$\mathbb{E}_{\tau \sim \pi_\theta}[\cdots]$</span>在当前策略下采样多条轨迹取平均</div>
+            <div class="item"><span class="symbol">$\sum_t$</span>对轨迹中每一步都做这件事</div>
+        </div>
+    </div>
+
+    <div class="box-analogy">
+        <strong>飞镖类比：</strong>你往墙上扔飞镖（采样动作），如果扔到靶心（$G_t$ 高），你就记住这次的出手角度，下次更倾向这么扔（增大概率）。如果扔歪了（$G_t$ 低），你就略微避开这个方向。REINFORCE 就是这个过程的数学表达。
+    </div>
+
+    <div class="box-warning">
+        <strong>致命缺陷：方差巨大。</strong>$G_t$ 是单次采样的实际回报，波动很大。如果奖励总是正的（比如 95-105 之间），所有动作的梯度方向都是"增大概率"，模型分不清好坏。需要几千条轨迹才能平均出有效信号。
+    </div>
+
+    <!-- Baseline + Advantage -->
+    <h3>Step 2: 引入 Baseline → Advantage</h3>
+
+    <h4>解决什么问题</h4>
+    <p>REINFORCE 方差太大。</p>
+
+    <h4>做法</h4>
+    <p>给 $G_t$ 减去一个只依赖状态的基准值 $b(s_t)$：</p>
+
+    <div class="formula-box">
+        <div class="label">加 Baseline 后的梯度</div>
+        $$\nabla_\theta J = \mathbb{E}\left[\sum_t \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot \underbrace{(G_t - b(s_t))}_{\text{有正有负，方差更小}}\right]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$b(s_t)$</span>基准值——"这个状态平均能拿多少分"。减去它让信号有正有负</div>
+            <div class="item"><span class="symbol">为什么可以减？</span>$\mathbb{E}_a[\nabla\log\pi \cdot b(s)] = 0$（可证明），不改变梯度期望，只降方差</div>
+        </div>
+    </div>
+
+    <p><strong>最佳 Baseline：状态价值函数 $V(s_t)$</strong></p>
+
+    <div class="formula-box key">
+        <div class="label">Advantage 函数</div>
+        $$A_t = G_t - V(s_t)$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$G_t$</span>这个动作之后<strong>实际</strong>获得的总回报</div>
+            <div class="item"><span class="symbol">$V(s_t)$</span>这个状态下<strong>平均</strong>能拿的总回报（baseline）</div>
+            <div class="item"><span class="symbol">$A_t$</span>差值——这个动作<strong>相比平均水平</strong>好了多少</div>
+        </div>
+    </div>
+
+    <div class="box-insight">
+        不再是"扔到靶子上就加强"，而是"比你平时水平好就加强，比平时差就削弱"。一个得分 96 和一个得分 104 的动作，如果平均水平是 100，现在就能清楚区分：-4 vs +4。
+    </div>
+
+    <!-- Actor-Critic -->
+    <h3>Step 3: Actor-Critic</h3>
+
+    <h4>解决什么问题</h4>
+    <p>$V(s_t)$ 是未知的，需要估计。</p>
+
+    <h4>做法</h4>
+    <p>训练一个神经网络 $V_\phi(s)$（Critic）来近似真实的 $V(s)$。</p>
+
+    <div class="formula-box">
+        <div class="label">Actor-Critic 双网络</div>
+        $$\text{Actor 损失: } L_{actor} = -\mathbb{E}\left[\log\pi_\theta(a_t|s_t) \cdot A_t\right]$$
+        $$\text{Critic 损失: } L_{critic} = \mathbb{E}\left[(V_\phi(s_t) - G_t)^2\right]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">Actor $\pi_\theta$</span>策略网络——决定做什么动作。梯度方向：好动作增大概率，坏动作减小概率</div>
+            <div class="item"><span class="symbol">Critic $V_\phi$</span>价值网络——评估状态好坏。训练目标：让预测值 $V_\phi(s)$ 接近真实回报 $G_t$</div>
+        </div>
+    </div>
+
+    <div class="box-warning">
+        <strong>新问题：步长灾难。</strong>标准梯度下降 $\theta \leftarrow \theta + \alpha\nabla J$ 的步长 $\alpha$ 极难选。参数空间一小步可能让某动作概率从 0.5 变到 0.01 → 策略崩溃 → 采集的数据也坏了 → 恶性循环（performance collapse）。
+    </div>
+
+    <!-- TRPO -->
+    <h3>Step 4: TRPO</h3>
+
+    <h4>解决什么问题</h4>
+    <p>策略更新步长过大会崩溃。</p>
+
+    <h4>核心思想</h4>
+    <p>不在参数空间限制步长，而在<strong>策略分布空间</strong>限制——新旧策略的 KL 散度不能超过 $\delta$。</p>
+
+    <h4>前置：重要性采样（Importance Sampling）</h4>
+    <p>用旧策略采的数据来评估新策略的好坏：</p>
+
+    <div class="formula-box">
+        <div class="label">重要性采样目标</div>
+        $$J(\theta) \approx \mathbb{E}_{(s,a) \sim \pi_{\theta_{old}}}\left[\frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)} \cdot A^{\pi_{\theta_{old}}}(s,a)\right]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)}$</span>概率比——修正因子。因为数据是旧策略采的，要用新/旧概率比来"校正"</div>
+            <div class="item"><span class="symbol">$A^{\pi_{\theta_{old}}}$</span>在旧策略下计算的 advantage</div>
+        </div>
+    </div>
+
+    <div class="formula-box highlight">
+        <div class="label">TRPO 优化目标</div>
+        $$\max_\theta \; \mathbb{E}_t\left[r_t(\theta) \cdot A_t\right] \quad \text{s.t.} \quad \mathbb{E}_t\left[D_{KL}(\pi_{\theta_{old}} \| \pi_\theta)\right] \leq \delta$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$</span>概率比。$r=1$：没变化。$r=2$：新策略对该动作概率翻倍。$r=0.5$：减半</div>
+            <div class="item"><span class="symbol">$r_t(\theta)\cdot A_t$</span>好动作($A>0$)→ 想增大 $r$（提高概率）；坏动作($A<0$)→ 想减小 $r$</div>
+            <div class="item"><span class="symbol">$D_{KL} \leq \delta$</span>硬约束：新旧策略的分布"距离"不超过 $\delta$（通常 0.01）</div>
+        </div>
+    </div>
+
+    <div class="box-insight">
+        TRPO 说的是："你可以改进策略，但每一步只能在旧策略的<strong>信任域</strong>（trust region）内移动。" 就像走迷宫时每步只能走一小格，确保不会一步踏入死胡同。
+    </div>
+
+    <div class="box-warning">
+        <strong>缺陷：</strong>求解带 KL 约束的优化需要计算 Fisher 信息矩阵（二阶导）、共轭梯度法、line search。实现复杂度高，大模型上不实用。
+    </div>
+
+    <!-- PPO teaser -->
+    <h3>Step 5: PPO — 用 Clip 替代 KL</h3>
+
+    <div class="formula-box highlight">
+        <div class="label">PPO-Clip 核心公式</div>
+        $$L^{PPO} = \mathbb{E}_t\left[\min\bigl(\underbrace{r_t(\theta)\cdot A_t}_{\text{未截断目标}},\;\; \underbrace{\text{clip}(r_t(\theta), 1{-}\epsilon, 1{+}\epsilon)\cdot A_t}_{\text{截断后目标}}\bigr)\right]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$r_t(\theta)$</span>概率比——新策略 vs 旧策略对该动作的概率之比</div>
+            <div class="item"><span class="symbol">$\text{clip}(\cdot, 1{-}\epsilon, 1{+}\epsilon)$</span>把概率比限制在 $[1-\epsilon,\;1+\epsilon]$ 范围内</div>
+            <div class="item"><span class="symbol">$\min(\cdot,\cdot)$</span>取两者中更悲观（更保守）的那个</div>
+            <div class="item"><span class="symbol">$\epsilon$</span>允许的最大偏离幅度，通常 0.1-0.2</div>
+        </div>
+    </div>
+
+    <div class="box-insight">
+        PPO 的哲学：不需要精确计算"新旧策略差了多远"（KL 散度），直接暴力截断——概率比超过 $1\pm\epsilon$ 就不让你继续动了。粗暴但有效，一阶优化器（Adam）就够用。
+    </div>
+</section>
+
+<!-- ==================== Section 4: PPO Detail ==================== -->
+<section id="ppo-detail">
+    <h2>4. PPO 完全详解</h2>
+
+    <h3>Clip 机制逐情况分析</h3>
+
+    <div class="comparison-grid">
+        <div class="comparison-card">
+            <h5>情况一：$A_t > 0$（好动作）</h5>
+            <p>模型想做的事：增大这个动作的概率 → $r_t$ 增大</p>
+            <p>clip 的限制：$r_t$ 最多到 $1+\epsilon$</p>
+            <p>超过后：梯度为零，停止更新</p>
+            <p><strong>效果：</strong>"可以更喜欢这个动作，但别一步到位"</p>
+        </div>
+        <div class="comparison-card">
+            <h5>情况二：$A_t < 0$（坏动作）</h5>
+            <p>模型想做的事：减小这个动作的概率 → $r_t$ 减小</p>
+            <p>clip 的限制：$r_t$ 最低到 $1-\epsilon$</p>
+            <p>低于后：梯度为零，停止更新</p>
+            <p><strong>效果：</strong>"可以不喜欢这个动作，但别一次改太多"</p>
+        </div>
+    </div>
+
+    <h4>图解 clip 效果</h4>
+    <div class="ascii-diagram">
+      A_t > 0 时（好动作，想增大概率）          A_t < 0 时（坏动作，想减小概率）
+
+目标值│            ____________              目标值│
+      │           /                                │____________
+      │          /                                 │             \
+      │         /  ← 正常学习区间                    │   正常区间 →  \
+      │        /                                   │               \
+      │───────/──────────────── r_t               │────────────────\──── r_t
+      │      │    │                                │           │    │
+           1-ε   1   1+ε                               1-ε   1   1+ε
+                       ↑                                ↑
+                  超过这里后                         低于这里后
+                  目标不再增长                       目标不再增长
+                  梯度 = 0                          梯度 = 0</div>
+
+    <h4>min 的作用</h4>
+    <p>$\min$ 在两个候选值中取<strong>更悲观的</strong>：如果 unclipped 目标因为 $r_t$ 偏离太远而给出过于乐观的梯度方向，clip 版本会截断它。这保证每次更新都是保守的。</p>
+
+    <h4>具体数值例子</h4>
+    <div class="step-card">
+        <p><strong>例：</strong>$\epsilon=0.2$，某好动作 $A_t = +3$，更新后 $r_t(\theta)=1.5$（概率比偏离过大）</p>
+        <p>Unclipped 目标：$1.5 \times 3 = 4.5$</p>
+        <p>Clipped 目标：$\text{clip}(1.5, 0.8, 1.2) \times 3 = 1.2 \times 3 = 3.6$</p>
+        <p>$\min(4.5, 3.6) = 3.6$ ← 取更保守的值。此时继续增大 $r_t$ 已经不会增大目标了 → 梯度为零，停止更新。</p>
+    </div>
+
+    <h3>GAE：Advantage 的实用计算方法</h3>
+
+    <p>理论上 $A_t = G_t - V(s_t)$，但实践中需要在偏差和方差之间权衡。GAE 通过 $\lambda$ 参数平滑这个权衡：</p>
+
+    <div class="formula-box key">
+        <div class="label">GAE 公式</div>
+        $$\hat{A}_t^{GAE(\gamma,\lambda)} = \sum_{l=0}^{T-t-1}(\gamma\lambda)^l \cdot \delta_{t+l}$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\delta_t = r_t + \gamma V(s_{t+1}) - V(s_t)$</span>TD 误差——"这一步的实际收获（$r_t + \gamma V(s_{t+1})$）比预期（$V(s_t)$）好/差多少"</div>
+            <div class="item"><span class="symbol">$(\gamma\lambda)^l$</span>衰减权重——越远的 TD 误差影响越小</div>
+            <div class="item"><span class="symbol">$\lambda = 0$</span>只看当前一步的 TD 误差 → 偏差高、方差低（相信 Critic 的估计）</div>
+            <div class="item"><span class="symbol">$\lambda = 1$</span>看到轨迹结束 → 偏差低、方差高（相信真实回报）</div>
+            <div class="item"><span class="symbol">$\lambda = 0.95$</span>常用折中值</div>
+        </div>
+    </div>
+
+    <div class="box-analogy">
+        <strong>TD 误差 $\delta_t$ 的直觉：</strong>你预期自己能考 80 分（$V(s_t)$），但实际这次拿了 85 分的感觉（$r_t + \gamma V(s_{t+1})$），所以 $\delta_t = +5$——一个"惊喜"。GAE 就是把多步的"惊喜"或"失望"加权求和。
+    </div>
+
+    <h3>PPO 完整训练循环</h3>
+    <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│  1. 用当前策略 π_θ_old 采集一批轨迹 (s, a, r, s')          │
+│                         ↓                                    │
+│  2. 对每步计算 GAE advantage: Â_t                            │
+│                         ↓                                    │
+│  3. 对这批数据做 K 个 epoch 的 mini-batch 梯度更新           │
+│     (K = 3~10，同一批数据反复用 ← PPO 的效率优势)            │
+│                         ↓                                    │
+│  4. 扔掉旧数据，θ_old ← θ，回到步骤 1                       │
+└─────────────────────────────────────────────────────────────┘</div>
+
+    <h3>PPO 总损失函数</h3>
+    <div class="formula-box">
+        <div class="label">三项加权</div>
+        $$L^{total} = \underbrace{L^{CLIP}}_{\text{策略更新}} - c_1 \cdot \underbrace{L^{VF}}_{\text{Critic 训练}} + c_2 \cdot \underbrace{S[\pi_\theta]}_{\text{熵奖励}}$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$L^{CLIP}$</span>PPO 的核心——截断后的策略目标（最大化）</div>
+            <div class="item"><span class="symbol">$L^{VF} = (V_\phi(s_t) - G_t)^2$</span>Critic 的均方误差损失——训练价值网络</div>
+            <div class="item"><span class="symbol">$S[\pi_\theta] = -\sum_a \pi(a|s)\log\pi(a|s)$</span>策略的熵——鼓励探索，避免过早收敛到单一动作</div>
+            <div class="item"><span class="symbol">$c_1, c_2$</span>平衡系数。$c_1 \approx 0.5$，$c_2 \approx 0.01$</div>
+        </div>
+    </div>
+
+    <h3>PPO 在 RLHF 中的特殊用法</h3>
+    <table>
+        <tr><th>概念</th><th>游戏场景</th><th>LLM 场景</th></tr>
+        <tr><td>状态 $s_t$</td><td>游戏画面</td><td>prompt + 已生成的 token 序列</td></tr>
+        <tr><td>动作 $a_t$</td><td>按键操作</td><td>下一个 token</td></tr>
+        <tr><td>轨迹 $\tau$</td><td>一局游戏</td><td>一次完整生成</td></tr>
+        <tr><td>奖励</td><td>每步环境反馈</td><td>末尾 RM 打分 + 每步 KL 惩罚</td></tr>
+        <tr><td>需要的模型</td><td>Actor + Critic（2个）</td><td>Actor + Critic + Reference + RM（4个）</td></tr>
+    </table>
+
+    <div class="formula-box">
+        <div class="label">RLHF 中的 Reward 结构</div>
+        $$R_t = \begin{cases} -\beta \log\dfrac{\pi_\theta(a_t|s_t)}{\pi_{ref}(a_t|s_t)} & t < T \text{ （中间步：KL 惩罚）}\\[10pt] r_{RM}(x, y) - \beta \log\dfrac{\pi_\theta(a_T|s_T)}{\pi_{ref}(a_T|s_T)} & t = T \text{ （最后一步：RM 打分 + KL 惩罚）}\end{cases}$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$-\beta\log\frac{\pi_\theta}{\pi_{ref}}$</span>KL 惩罚——偏离参考模型越远惩罚越大，防止 reward hacking</div>
+            <div class="item"><span class="symbol">$r_{RM}(x,y)$</span>Reward Model 给整条回答的打分——只在最后一步给出</div>
+            <div class="item"><span class="symbol">$\beta$</span>KL 强度。越大约束越紧，模型越保守</div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== Section 5: GRPO ==================== -->
+<section id="grpo">
+    <h2>5. GRPO 详解</h2>
+
+    <h3>动机：PPO 在 LLM 中的痛点</h3>
+    <p>PPO 需要 Critic 网络估计 $V(s)$。在 LLM 场景中，Critic 和 Actor 一样大（几十亿参数），<strong>显存直接翻倍</strong>。GRPO 的贡献：用一个极简的方法替代 Critic。</p>
+
+    <h3>GRPO 核心做法</h3>
+
+    <div class="step-card">
+        <div class="step-number">1</div>
+        <h4 style="padding-top:8px">采样一组回答</h4>
+        <p>对同一个 prompt $x$，用当前策略 $\pi_{\theta_{old}}$ 一次采样 $G$ 条回答 $\{y_1, y_2, \ldots, y_G\}$（$G$ 通常 = 64）</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">2</div>
+        <h4 style="padding-top:8px">各自打分</h4>
+        <p>每条回答获得 reward $r_i$（来自 RM 或规则判定，如数学答案对错）</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">3</div>
+        <h4 style="padding-top:8px">组内标准化得到 Advantage</h4>
+        <div class="formula-box key">
+            <div class="label">GRPO Advantage（替代 Critic）</div>
+            $$\hat{A}_i = \frac{r_i - \text{mean}(\{r_1, \ldots, r_G\})}{\text{std}(\{r_1, \ldots, r_G\})}$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">$r_i$</span>第 $i$ 条回答的 reward 得分</div>
+                <div class="item"><span class="symbol">$\text{mean}(\cdot)$</span>组内平均分——充当 baseline（替代 $V(s)$）</div>
+                <div class="item"><span class="symbol">$\text{std}(\cdot)$</span>组内标准差——归一化，让 advantage 量级稳定</div>
+                <div class="item"><span class="symbol">$\hat{A}_i > 0$</span>这条回答比组内平均好</div>
+                <div class="item"><span class="symbol">$\hat{A}_i < 0$</span>这条回答比组内平均差</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">4</div>
+        <h4 style="padding-top:8px">PPO 风格的 Clip 优化</h4>
+        <div class="formula-box highlight">
+            <div class="label">GRPO 优化目标</div>
+            $$L^{GRPO} = \frac{1}{G}\sum_{i=1}^{G} \frac{1}{|y_i|}\sum_{t=1}^{|y_i|}\left[\min\left(r_{i,t}(\theta) \cdot \hat{A}_i,\; \text{clip}(r_{i,t}(\theta), 1{-}\epsilon, 1{+}\epsilon) \cdot \hat{A}_i\right) - \beta D_{KL}^{(t)}\right]$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">$\frac{1}{G}\sum_{i=1}^{G}$</span>对组内 $G$ 条回答取平均</div>
+                <div class="item"><span class="symbol">$\frac{1}{|y_i|}\sum_{t=1}^{|y_i|}$</span>对第 $i$ 条回答的每个 token 取平均</div>
+                <div class="item"><span class="symbol">$r_{i,t}(\theta)=\frac{\pi_\theta(a_{i,t}|s_{i,t})}{\pi_{\theta_{old}}(a_{i,t}|s_{i,t})}$</span>第 $i$ 条回答第 $t$ 个 token 的概率比</div>
+                <div class="item"><span class="symbol">$\hat{A}_i$</span>整条回答共享同一个 advantage（序列级别）</div>
+                <div class="item"><span class="symbol">$\text{clip}(\cdot)$</span>和 PPO 一样的截断机制</div>
+                <div class="item"><span class="symbol">$-\beta D_{KL}^{(t)}$</span>显式 KL 惩罚——约束不偏离参考模型太远</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box-analogy">
+        <strong>考试类比：</strong>同一道题让模型答 64 遍，有的答对有的答错。答对的属于"好回答"（$\hat{A}>0$），答错的属于"差回答"（$\hat{A}<0$）。然后用 PPO 的方式加强好回答、削弱差回答。全程不需要另一个模型来评估"这道题有多难"——组内平均分本身就是 baseline。
+    </div>
+
+    <h3>GRPO vs PPO 对比</h3>
+    <table>
+        <tr><th>维度</th><th>PPO</th><th>GRPO</th></tr>
+        <tr><td>Advantage 来源</td><td>Critic 网络估计 $V(s)$（token 级别）</td><td>组内 reward 标准化（序列级别）</td></tr>
+        <tr><td>是否需要 Critic</td><td>是（显存翻倍）</td><td>否（省一半显存）</td></tr>
+        <tr><td>KL 约束方式</td><td>reward 中隐式 KL 惩罚</td><td>损失函数中显式 KL 项</td></tr>
+        <tr><td>采样</td><td>每个 prompt 采 1 条</td><td>每个 prompt 采 $G$ 条（如 64）</td></tr>
+        <tr><td>Advantage 粒度</td><td>每个 token 有不同的 $A_t$</td><td>整条回答共享 $\hat{A}_i$</td></tr>
+        <tr><td>计算代价</td><td>Critic 前向/反向 + PPO 更新</td><td>$G$ 次推理 + PPO 更新（无 Critic）</td></tr>
+    </table>
+
+    <h3>DeepSeek-R1 中的实践</h3>
+    <table>
+        <tr><th>设计选择</th><th>做法</th><th>原因</th></tr>
+        <tr><td>组大小</td><td>$G = 64$</td><td>越大 advantage 估计越稳定</td></tr>
+        <tr><td>Reward</td><td>规则判定（对/错）</td><td>数学/代码答案可验证，无需 RM</td></tr>
+        <tr><td>起点</td><td>直接从 base model 开始</td><td>发现不经 SFT 也能涌现 CoT 推理</td></tr>
+    </table>
+</section>
+
+<!-- ==================== Section 6: RLVR ==================== -->
+<section id="rlvr">
+    <h2>6. RLVR 范式详解</h2>
+
+    <h3>什么是 RLVR？</h3>
+    <p><strong>RLVR = Reinforcement Learning with Verifiable Rewards</strong>，即"用可验证的奖励信号做强化学习"。它不是一个具体算法，而是一个<strong>训练范式</strong>——描述的是 reward 从哪来，而不是怎么优化。</p>
+
+    <div class="formula-box key">
+        <div class="label">概念层次区分</div>
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">RLVR</span><strong>范式</strong>——reward 怎么来（可验证规则判定，如对/错）</div>
+            <div class="item"><span class="symbol">GRPO / PPO</span><strong>算法</strong>——拿到 reward 后怎么更新策略</div>
+            <div class="item"><span class="symbol">DeepSeek-R1</span>= RLVR 范式 + GRPO 算法</div>
+        </div>
+    </div>
+
+    <h3>RLVR 在整体知识体系中的位置</h3>
+    <div class="ascii-diagram">
+LLM 训练范式
+├── RLHF —— reward 从人类偏好中学习（需要训练 RM）
+│   ├── 优化算法：PPO
+│   └── 简化变体：DPO（跳过 RM）
+│
+├── RLVR —— reward 来自可验证规则（不需要 RM）   ← 当前推理方向主流
+│   ├── 优化算法：GRPO（DeepSeek-R1）
+│   ├── 优化算法：PPO
+│   └── 优化算法：REINFORCE 变体
+│
+└── RLAIF —— reward 从 AI 反馈中学习（AI 做标注员）
+    └── 优化算法：PPO / DPO</div>
+
+    <h3>为什么 RLVR 突然火了？</h3>
+    <p>传统 RLHF 依赖训练出来的 Reward Model，有三个致命问题：</p>
+    <table>
+        <tr><th>问题</th><th>表现</th><th>RLVR 如何解决</th></tr>
+        <tr><td>Reward Hacking</td><td>模型学会讨好 RM 而非真正变好</td><td>规则判定不可被 hack（对就是对）</td></tr>
+        <tr><td>RM 泛化误差</td><td>RM 在分布外样本上打分不准</td><td>规则判定在任何样本上都精确</td></tr>
+        <tr><td>训练成本高</td><td>RM 需要大量人类标注 + 训练</td><td>无需 RM，零额外训练成本</td></tr>
+    </table>
+
+    <h3>RLVR 的标志性发现（DeepSeek-R1）</h3>
+    <div class="box-insight">
+        从 base model 出发，<strong>仅用 RLVR（数学题对错作为 reward）</strong>，不经过 SFT，模型能自发涌现：Chain-of-Thought 推理、自我纠错、反思回溯、分步验证。这打破了"需要先 SFT 教会推理格式"的传统假设。
+    </div>
+
+    <h3>RLVR 的 Reward 设计</h3>
+    <p>RLVR 中 reward 的典型形式：</p>
+    <div class="formula-box">
+        <div class="label">可验证 Reward 的常见设计</div>
+        $$r(x, y) = \begin{cases} +1 & \text{答案正确（通过验证）} \\ -1 \text{ 或 } 0 & \text{答案错误} \end{cases}$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$x$</span>问题/任务（如一道数学题）</div>
+            <div class="item"><span class="symbol">$y$</span>模型生成的完整回答（含推理过程）</div>
+            <div class="item"><span class="symbol">验证方式</span>数学：提取最终答案对比标准答案；代码：运行测试用例</div>
+            <div class="item"><span class="symbol">注意</span>reward 只看最终答案对错（outcome-level），不管推理过程</div>
+        </div>
+    </div>
+
+    <p>更精细的 reward 设计也可加入格式奖励：</p>
+    <div class="formula-box">
+        $$r(x, y) = r_{accuracy}(x, y) + \alpha \cdot r_{format}(y)$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$r_{accuracy}$</span>答案正确性（+1 / 0）</div>
+            <div class="item"><span class="symbol">$r_{format}$</span>格式奖励——是否使用了指定的思考标签（如 &lt;think&gt;...&lt;/think&gt;）</div>
+            <div class="item"><span class="symbol">$\alpha$</span>格式奖励权重（通常很小，如 0.1）</div>
+        </div>
+    </div>
+
+    <h3>RLVR 的适用边界</h3>
+    <table>
+        <tr><th>可以用 RLVR</th><th>不能用 RLVR</th></tr>
+        <tr><td>数学题（答案可验证）</td><td>开放式对话（无标准答案）</td></tr>
+        <tr><td>代码生成（可跑测试）</td><td>创意写作</td></tr>
+        <tr><td>逻辑推理（可形式化验证）</td><td>情感共鸣、风格偏好</td></tr>
+        <tr><td>事实问答（有确定答案）</td><td>复杂多维度对齐（有用+无害+诚实）</td></tr>
+        <tr><td>工具调用（执行成功/失败）</td><td>主观质量评估</td></tr>
+    </table>
+
+    <div class="box-warning">
+        RLVR 不是万能的。对于"好坏没有客观标准"的任务（对话、写作、情感），仍需 RLHF/DPO。当前最强的模型通常是 <strong>RLVR（提升推理）+ RLHF（提升对齐）</strong> 的组合。
+    </div>
+
+    <h3>RLVR vs RLHF 完整对比</h3>
+    <table>
+        <tr><th>维度</th><th>RLHF</th><th>RLVR</th></tr>
+        <tr><td>Reward 来源</td><td>训练出来的 Reward Model</td><td>可验证的规则/程序</td></tr>
+        <tr><td>Reward 准确性</td><td>有误差（RM 泛化有限）</td><td>100% 准确（规则不出错）</td></tr>
+        <tr><td>是否可被 Hack</td><td>是（模型学会讨好 RM）</td><td>否（对就是对，无捷径）</td></tr>
+        <tr><td>数据需求</td><td>大量人类偏好标注</td><td>只需问题+标准答案</td></tr>
+        <tr><td>适用任务</td><td>开放式、主观性任务</td><td>答案可验证的客观任务</td></tr>
+        <tr><td>训练成本</td><td>高（4个模型 + 标注成本）</td><td>低（无 RM，规则验证近乎免费）</td></tr>
+        <tr><td>涌现能力</td><td>有限</td><td>可涌现 CoT、自我纠错（DeepSeek-R1）</td></tr>
+        <tr><td>代表工作</td><td>InstructGPT、ChatGPT</td><td>DeepSeek-R1、Qwen-2.5-Math</td></tr>
+    </table>
+
+    <h3>RLVR 的进阶话题</h3>
+
+    <h4>Outcome Reward vs Process Reward</h4>
+    <p>标准 RLVR 只看最终答案对错（Outcome-level），但也可以做更细粒度的过程监督：</p>
+    <table>
+        <tr><th></th><th>Outcome Reward (ORM)</th><th>Process Reward (PRM)</th></tr>
+        <tr><td>打分粒度</td><td>整条回答给一个分</td><td>推理链每一步各给一个分</td></tr>
+        <tr><td>信号密度</td><td>稀疏（只有结尾一个信号）</td><td>密集（每步都有反馈）</td></tr>
+        <tr><td>标注成本</td><td>低（只需验证最终答案）</td><td>高（需要逐步标注正误）</td></tr>
+        <tr><td>效果</td><td>对简单任务够用</td><td>多步推理中显著更强（OpenAI 实证）</td></tr>
+        <tr><td>是否仍是 RLVR？</td><td>是</td><td>如果每步可自动验证则是；需要人类标注则退化为 RLHF</td></tr>
+    </table>
+
+    <h4>RLVR 能涌现推理的原因（直觉解释）</h4>
+    <div class="box-insight">
+        为什么只奖励"答案对"就能让模型自发学会"想过程"？因为复杂题目<strong>直接猜答案几乎不可能得分</strong>，而"先思考、分步骤、验证中间结果"是唯一能稳定提升正确率的策略。RL 的探索机制自然会发现并强化这种策略。模型不是被教会推理的，而是在 reward 信号的引导下自己发现推理是"得分最高的行为模式"。
+    </div>
+
+    <h3>面试中怎么讲 RLVR</h3>
+    <div class="box-interview">
+        "RLVR 是用可验证的奖励信号做强化学习的范式，区别于 RLHF 依赖训练出来的 Reward Model。优势是 reward 完全准确、不可被 hack，代价是只能用在答案可验证的任务上。DeepSeek-R1 证明了 RLVR + GRPO 能从 base model 涌现推理能力，是当前提升 LLM 推理能力的主流范式。"
+    </div>
+
+    <div class="box-interview">
+        <strong>追问：RLVR 的局限？</strong><br>
+        "核心局限是 reward 必须可验证。开放式生成、风格偏好、复杂对齐仍需 RLHF/DPO。另外只用 outcome reward 信号稀疏，复杂推理可能需要 process reward 辅助，但后者的自动验证成本高。当前最强模型通常是 RLVR + RLHF 的组合。"
+    </div>
+</section>
+
+<!-- ==================== Section 7: RLHF ==================== -->
+<section id="rlhf">
+    <h2>7. RLHF 完整流程</h2>
+
+    <div class="step-card">
+        <div class="step-number">1</div>
+        <h4 style="padding-top:8px">SFT（Supervised Fine-Tuning）</h4>
+        <p>用人工标注的高质量 (prompt, response) 对做监督微调 → 得到 $\pi_{SFT}$</p>
+        <p><strong>直觉：</strong>让模型先学会"说人话"，有基本的指令跟随能力。</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">2</div>
+        <h4 style="padding-top:8px">训练 Reward Model</h4>
+        <p>同一 prompt 生成多个回复 → 人类排序 → 训练打分器</p>
+        <div class="formula-box">
+            <div class="label">RM 损失（Bradley-Terry 模型）</div>
+            $$L_{RM} = -\mathbb{E}_{(x, y_w, y_l)}\left[\log\sigma\bigl(r(x, y_w) - r(x, y_l)\bigr)\right]$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">$r(x, y_w)$</span>RM 给好回答的打分</div>
+                <div class="item"><span class="symbol">$r(x, y_l)$</span>RM 给差回答的打分</div>
+                <div class="item"><span class="symbol">$\sigma(\cdot)$</span>sigmoid——把分数差映射到 [0,1] 概率</div>
+                <div class="item"><span class="symbol">优化方向</span>让 $r(x,y_w) > r(x,y_l)$，即好回答分数高于差回答</div>
+            </div>
+        </div>
+        <p><strong>直觉：</strong>训练一个"裁判"，能给回答质量打分。它通过看大量人类偏好对学会了什么是"好回答"。</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">3</div>
+        <h4 style="padding-top:8px">PPO 优化策略</h4>
+        <p>用 RM 的打分作为奖励，PPO 优化 LLM 生成策略。加 KL 惩罚防止 reward hacking。</p>
+        <p>需要同时维护 4 个模型：Actor + Critic + Reference Model + Reward Model。</p>
+    </div>
+
+    <div class="box-interview">
+        "RLHF 把人类偏好转化为优化信号来对齐 LLM。三步走：SFT 得基础策略，人类偏好排序训练 Reward Model，PPO 用 RM 打分做策略优化并加 KL 约束防止 reward hacking。近期趋势是用 DPO 简化流程或 GRPO 减少计算开销。"
+    </div>
+</section>
+
+<!-- ==================== Section 7: DPO ==================== -->
+<section id="dpo">
+    <h2>8. DPO 公式推导</h2>
+
+    <h3>核心洞察</h3>
+    <p>DPO 证明了：<strong>不需要单独训练 Reward Model，偏好数据可以直接优化策略。</strong></p>
+
+    <h3>推导过程</h3>
+
+    <h4>Step 1: RLHF 目标的解析解</h4>
+    <div class="formula-box">
+        <div class="label">RLHF 优化目标</div>
+        $$\max_\pi \; \mathbb{E}_{y \sim \pi}[r(x,y)] - \beta\, D_{KL}[\pi(y|x) \| \pi_{ref}(y|x)]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\mathbb{E}[r(x,y)]$</span>最大化 RM 给的奖励</div>
+            <div class="item"><span class="symbol">$-\beta D_{KL}$</span>但不要偏离参考模型太远</div>
+        </div>
+    </div>
+
+    <p>这个优化问题有<strong>闭合形式的最优解</strong>：</p>
+    <div class="formula-box">
+        $$\pi^*(y|x) = \frac{1}{Z(x)} \pi_{ref}(y|x) \cdot \exp\left(\frac{1}{\beta}r(x,y)\right)$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$Z(x)$</span>归一化常数，确保概率和为 1</div>
+        </div>
+    </div>
+
+    <h4>Step 2: 反解出 Reward</h4>
+    <p>从上式解出 $r$：</p>
+    <div class="formula-box highlight">
+        $$r(x,y) = \beta\log\frac{\pi^*(y|x)}{\pi_{ref}(y|x)} + \beta\log Z(x)$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">关键洞察</span>reward 可以用"策略的对数概率比"来表示！不需要单独训练 RM。</div>
+        </div>
+    </div>
+
+    <h4>Step 3: 代入偏好模型，$Z(x)$ 消掉</h4>
+    <p>Bradley-Terry 模型：$P(y_w \succ y_l) = \sigma(r(x,y_w) - r(x,y_l))$</p>
+    <p>代入反解的 reward，做差时 $\beta\log Z(x)$ 消掉（两个 reward 共享同一个 $x$）：</p>
+
+    <div class="formula-box highlight">
+        <div class="label">DPO 最终损失函数</div>
+        $$L_{DPO} = -\mathbb{E}_{(x, y_w, y_l)}\left[\log\sigma\left(\beta \log\frac{\pi_\theta(y_w|x)}{\pi_{ref}(y_w|x)} - \beta \log\frac{\pi_\theta(y_l|x)}{\pi_{ref}(y_l|x)}\right)\right]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\beta\log\frac{\pi_\theta(y_w|x)}{\pi_{ref}(y_w|x)}$</span><strong>好回答的隐式奖励</strong>——当前模型相比参考模型更偏好好回答的程度</div>
+            <div class="item"><span class="symbol">$\beta\log\frac{\pi_\theta(y_l|x)}{\pi_{ref}(y_l|x)}$</span><strong>坏回答的隐式奖励</strong>——当前模型相比参考模型更偏好坏回答的程度</div>
+            <div class="item"><span class="symbol">两者之差</span>好回答的隐式奖励应该高于坏回答——和训练 RM 的逻辑一模一样</div>
+            <div class="item"><span class="symbol">$\sigma(\cdot)$</span>把差值映射到 (0,1)，表示"模型认为 $y_w$ 比 $y_l$ 好"的概率</div>
+            <div class="item"><span class="symbol">$-\log$</span>极大似然——让这个概率尽量接近 1</div>
+            <div class="item"><span class="symbol">$\beta$</span>放大/缩小隐式奖励的差异。$\beta$ 大 → 保守；$\beta$ 小 → 激进</div>
+        </div>
+    </div>
+
+    <h3>梯度的直觉</h3>
+    <div class="formula-box">
+        <div class="label">DPO 梯度</div>
+        $$\nabla_\theta L \propto -\beta\;\underbrace{\sigma(\hat{r}_l - \hat{r}_w)}_{\text{自适应权重}}\;\left[\underbrace{\nabla_\theta\log\pi_\theta(y_w|x)}_{\text{增大好回答概率}} - \underbrace{\nabla_\theta\log\pi_\theta(y_l|x)}_{\text{减小坏回答概率}}\right]$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\sigma(\hat{r}_l - \hat{r}_w)$</span>当模型还搞错排序（给坏回答更高隐式奖励）时 → 接近 1 → 梯度大，用力纠正</div>
+            <div class="item"><span class="symbol">当模型学对了时</span>$\hat{r}_w > \hat{r}_l$ → $\sigma$ 接近 0 → 梯度小，几乎不更新</div>
+            <div class="item"><span class="symbol">作用</span>自适应加权——该学的地方用力学，已学会的不浪费</div>
+        </div>
+    </div>
+
+    <div class="box-insight">
+        DPO 的优美之处：<strong>一个损失函数同时完成了"学会打分"和"优化策略"两件事</strong>，数学上等价于先训练 RM 再做 PPO，但实操上只需一阶段训练。
+    </div>
+</section>
+
+<!-- ==================== Section 8: Reward ==================== -->
+<section id="reward">
+    <h2>9. Reward 设计方法论</h2>
+
+    <h3>Reward 来源的完整谱系</h3>
+    <table>
+        <tr><th>类型</th><th>做法</th><th>适用场景</th><th>代表</th></tr>
+        <tr><td>手工设计</td><td>人为定义奖励规则</td><td>目标可量化（游戏、机器人）</td><td>CartPole、围棋</td></tr>
+        <tr><td>从人类偏好学习</td><td>训练 Reward Model</td><td>目标模糊主观（文本质量）</td><td>RLHF</td></tr>
+        <tr><td>逆强化学习 (IRL)</td><td>从专家轨迹反推 reward</td><td>有演示但 reward 未知</td><td>自动驾驶、GAIL</td></tr>
+        <tr><td>内在奖励</td><td>好奇心/新颖性驱动</td><td>外部奖励稀疏</td><td>ICM、RND</td></tr>
+        <tr><td>基于规则</td><td>答案对错的确定性判定</td><td>数学/代码推理</td><td>DeepSeek-R1</td></tr>
+        <tr><td>过程奖励 (PRM)</td><td>对推理链每步打分</td><td>多步推理</td><td>OpenAI "Let's Verify"</td></tr>
+        <tr><td>自我奖励</td><td>LLM 自评自改</td><td>自我改进循环</td><td>Meta Self-Rewarding</td></tr>
+    </table>
+
+    <h3>Reward Shaping 的风险与理论</h3>
+    <p><strong>风险：</strong>shaping 不当 → reward hacking。例如给"靠近目标"加分，agent 在目标旁反复晃动刷分而不完成任务。</p>
+    <div class="formula-box">
+        <div class="label">安全的 Reward Shaping（Ng 1999）</div>
+        $$F(s, s') = \gamma\Phi(s') - \Phi(s)$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\Phi(s)$</span>势函数——只依赖状态的标量函数</div>
+            <div class="item"><span class="symbol">保证</span>基于势函数的 shaping <strong>不改变最优策略</strong>，只加速学习</div>
+        </div>
+    </div>
+
+    <div class="box-interview">
+        "Reward 来源取决于任务特性。目标可量化就手工定义；目标模糊就从人类偏好学习（RLHF）；有专家演示就用 IRL；外部信号稀疏就加内在奖励。LLM 领域近期趋势是规则 reward（可验证任务）和 PRM（过程监督）。"
+    </div>
+</section>
+
+<!-- ==================== Section 9: Comparison ==================== -->
+<section id="comparison">
+    <h2>10. 算法对比总结</h2>
+
+    <h3>策略优化算法对比</h3>
+    <table>
+        <tr><th>算法</th><th>核心思想</th><th>优势</th><th>劣势</th><th>适用场景</th></tr>
+        <tr><td><strong>REINFORCE</strong></td><td>回报加权梯度</td><td>简单、理论优美</td><td>方差大、效率差</td><td>教学</td></tr>
+        <tr><td><strong>A2C/A3C</strong></td><td>Actor-Critic + 并行</td><td>方差低、可并行</td><td>步长敏感</td><td>Atari</td></tr>
+        <tr><td><strong>TRPO</strong></td><td>KL 约束信任域</td><td>理论保证单调改进</td><td>二阶优化慢</td><td>需要稳定性保证</td></tr>
+        <tr><td><strong>PPO</strong></td><td>clip 近似信任域</td><td>简单、稳定、通用</td><td>需要 Critic、超参敏感</td><td>通用（游戏/机器人/LLM）</td></tr>
+        <tr><td><strong>SAC</strong></td><td>最大熵 off-policy</td><td>数据效率高、探索好</td><td>仅限连续动作</td><td>机器人控制</td></tr>
+        <tr><td><strong>GRPO</strong></td><td>组内相对排名</td><td>省显存、无 Critic</td><td>需多次采样、序列级 A</td><td>LLM 推理对齐</td></tr>
+    </table>
+
+    <h3>对齐算法对比</h3>
+    <table>
+        <tr><th>算法</th><th>需要 RM？</th><th>数据需求</th><th>复杂度</th><th>效果上限</th></tr>
+        <tr><td><strong>RLHF (PPO)</strong></td><td>是（显式）</td><td>pairwise 偏好</td><td>高（4 个模型）</td><td>最强（在线采样）</td></tr>
+        <tr><td><strong>DPO</strong></td><td>否（隐式）</td><td>pairwise 偏好</td><td>低（1 阶段）</td><td>接近 RLHF</td></tr>
+        <tr><td><strong>GRPO</strong></td><td>可选</td><td>可验证 reward</td><td>中（无 Critic）</td><td>推理任务强</td></tr>
+        <tr><td><strong>KTO</strong></td><td>否</td><td>二元标签</td><td>低</td><td>数据少时优势</td></tr>
+        <tr><td><strong>Online DPO</strong></td><td>否</td><td>在线偏好</td><td>中</td><td>强于离线 DPO</td></tr>
+        <tr><td><strong>RLVR + GRPO</strong></td><td>否（规则验证）</td><td>问题+标准答案</td><td>中</td><td>推理任务最强</td></tr>
+    </table>
+
+    <h3>如何选择？</h3>
+    <div class="box-insight">
+        <strong>通用游戏/机器人</strong> → PPO（最稳）<br>
+        <strong>LLM 通用对齐，资源有限</strong> → DPO（最简）<br>
+        <strong>LLM 推理（数学/代码）</strong> → RLVR + GRPO（DeepSeek-R1 路线）<br>
+        <strong>偏好数据少</strong> → KTO（只需好/坏标签）<br>
+        <strong>追求最佳效果</strong> → Online RLHF 或 Iterative DPO
+    </div>
+
+    <h3>演进哲学</h3>
+    <div class="box-analogy">
+        RL 算法演进遵循<strong>奥卡姆剃刀</strong>——不是"越简单越好"，而是"不引入不必要的复杂度"。每次简化都有隐含条件，条件打破时就要退回更通用的方法。TRPO→PPO：clip 在实践中够用。PPO→GRPO：LLM 场景下 Critic 不划算。RLHF→DPO：数据分布接近时无需显式 RM。
+    </div>
+</section>
+
+<!-- ==================== Section 10: FAQ ==================== -->
+<section id="faq">
+    <h2>11. 高频面试问答</h2>
+
+    <div class="step-card">
+        <h4>Q: On-policy vs Off-policy？</h4>
+        <p><strong>On-policy：</strong>用当前策略采的数据更新当前策略，数据用完即丢。代表：PPO、A2C。</p>
+        <p><strong>Off-policy：</strong>可以用历史数据更新，数据可复用。代表：DQN、SAC。</p>
+        <p><strong>PPO 的特殊性：</strong>严格 on-policy，但一批数据做多 epoch 更新（3-10 次），是折中方案。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: 为什么 PPO 比 TRPO 好用？</h4>
+        <p>TRPO 需要 Fisher 矩阵 + 共轭梯度 + line search（二阶）。PPO 只用 Adam（一阶），实现简单 10 倍，效果相当。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: DQN 的三个关键技巧？</h4>
+        <p><strong>Experience Replay：</strong>打破数据时间相关性。<strong>Target Network：</strong>稳定目标，避免追自己的尾巴。<strong>ε-greedy：</strong>平衡探索与利用。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: Model-free vs Model-based？</h4>
+        <p><strong>Model-free：</strong>不学环境动力学，通用但数据效率低。<strong>Model-based：</strong>先学环境模型再 planning，数据效率高但受模型误差积累限制。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: 如何处理 sparse reward？</h4>
+        <p>Reward Shaping（加中间奖励）、Curiosity（内在奖励）、HER（事后改目标）、Curriculum Learning（先易后难）。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: Reward Hacking 怎么防？</h4>
+        <p>KL 约束（限制偏离）、多维 Reward（多目标平衡）、Process RM（过程监督）、规则 Reward（不可 hack）。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: RLHF vs DPO vs GRPO 怎么选？</h4>
+        <p><strong>DPO：</strong>资源有限、偏好数据和模型分布接近。<strong>RLHF：</strong>需要在线采样、追求最佳效果。<strong>GRPO：</strong>reward 可验证（数学/代码）、想省显存。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: PPO 的 $\epsilon$ 怎么选？</h4>
+        <p>通常 0.1-0.2。太小约束紧学得慢，太大相当于没约束会崩。部分实现做线性退火。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: DPO 中 $Z(x)$ 为什么消掉？有什么限制？</h4>
+        <p>Bradley-Terry 只看 reward 差值，$Z(x)$ 与 $y$ 无关所以消掉。限制：隐式 reward 绝对值不可解释，不能用于拒绝采样。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: GRPO 的组大小 $G$ 怎么选？</h4>
+        <p>通常 32-64。越大 advantage 估计越稳定但推理成本线性增长。太小（如 4）会导致标准化后的 advantage 噪声大。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: RLVR 是什么？和 RLHF 什么关系？</h4>
+        <p><strong>RLVR</strong> = Reinforcement Learning with Verifiable Rewards，是一种训练范式而非具体算法。它用可验证的规则（如答案对错）作为 reward，无需训练 RM。和 RLHF 的区别在于 reward 来源不同：RLHF 从人类偏好学习 reward，RLVR 用确定性规则验证。RLVR 适用于可验证任务（数学/代码），RLHF 适用于主观任务（对话/写作）。</p>
+    </div>
+
+    <div class="step-card">
+        <h4>Q: 为什么 RLVR 能让模型涌现推理能力？</h4>
+        <p>复杂题目直接猜答案几乎不可能得分，而"先思考、分步骤、验证中间结果"是唯一能稳定提升正确率的策略。RL 的探索机制自然会发现并强化这种模式。模型不是被教会推理的，而是在 reward 信号引导下自己发现"推理=高 reward"。</p>
+    </div>
+</section>
+
+<footer>
+    <p><strong>推荐学习资源</strong></p>
+    <p><a href="https://www.youtube.com/watch?v=2pWv7GOvuf0">David Silver RL 课程</a> · <a href="https://spinningup.openai.com/">OpenAI Spinning Up</a> · <a href="https://lilianweng.github.io/posts/2018-04-08-policy-gradient/">Lilian Weng 博客</a> · <a href="https://rail.eecs.berkeley.edu/deeprlcourse/">CS285 (UC Berkeley)</a></p>
+    <p style="margin-top: 12px; color: var(--gray-600);">RL Interview Quick Reference · 2025</p>
+</footer>
+
+</div>
+</body>
+</html>
