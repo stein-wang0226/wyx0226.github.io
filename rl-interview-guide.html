@@ -806,11 +806,23 @@ A = 0 → 和平均水平一样</div>
         $$\nabla_\theta J = \mathbb{E}\left[\sum_t \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot \underbrace{(G_t - b(s_t))}_{\text{有正有负，方差更小}}\right]$$
         <div class="formula-annotation">
             <div class="item"><span class="symbol">$b(s_t)$</span>基准值——"这个状态平均能拿多少分"。减去它让信号有正有负</div>
-            <div class="item"><span class="symbol">为什么可以减？</span>$\mathbb{E}_a[\nabla\log\pi \cdot b(s)] = 0$（可证明），不改变梯度期望，只降方差</div>
         </div>
     </div>
 
-    <p><strong>最佳 Baseline：状态价值函数 $V(s_t)$</strong></p>
+    <h4>为什么可以减？（证明）</h4>
+    <p>需要证明减去 baseline 不改变梯度的期望值：</p>
+    <div class="formula-box">
+        <div class="label">证明 $\mathbb{E}[\nabla\log\pi \cdot b(s)] = 0$</div>
+        $$\mathbb{E}_{a \sim \pi}\left[\nabla_\theta\log\pi_\theta(a|s) \cdot b(s)\right] = b(s) \cdot \sum_a \nabla_\theta\pi_\theta(a|s)$$
+        $$= b(s) \cdot \nabla_\theta \underbrace{\sum_a \pi_\theta(a|s)}_{=1} = b(s) \cdot \nabla_\theta 1 = 0$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">关键步骤</span>$\nabla\log\pi = \frac{\nabla\pi}{\pi}$，所以 $\pi \cdot \nabla\log\pi = \nabla\pi$。求和后 $\sum_a \nabla\pi(a|s) = \nabla\sum_a\pi(a|s) = \nabla 1 = 0$</div>
+            <div class="item"><span class="symbol">$b(s)$ 可以提出来</span>因为 $b(s)$ 只依赖状态，不依赖动作 $a$，对 $a$ 的期望来说是常数</div>
+            <div class="item"><span class="symbol">结论</span>减去任何只依赖 $s$ 的函数都不改变梯度期望，但能降低方差</div>
+        </div>
+    </div>
+
+    <p><strong>最佳 Baseline：状态价值函数 $V(s_t)$</strong>——理论可证明，$b(s) = V(s)$ 时方差最小。</p>
 
     <div class="formula-box key">
         <div class="label">Advantage 函数</div>
@@ -833,16 +845,22 @@ A = 0 → 和平均水平一样</div>
     <p>$V(s_t)$ 是未知的，需要估计。</p>
 
     <h4>做法</h4>
-    <p>训练一个神经网络 $V_\phi(s)$（Critic）来近似真实的 $V(s)$。</p>
+    <p>训练一个神经网络 $V_\phi(s)$（Critic）来近似真实的 $V(s)$。两个网络协同工作：</p>
 
     <div class="formula-box">
         <div class="label">Actor-Critic 双网络</div>
-        $$\text{Actor 损失: } L_{actor} = -\mathbb{E}\left[\log\pi_\theta(a_t|s_t) \cdot A_t\right]$$
-        $$\text{Critic 损失: } L_{critic} = \mathbb{E}\left[(V_\phi(s_t) - G_t)^2\right]$$
+        $$\text{Actor 更新: } \theta \leftarrow \theta + \alpha \cdot \nabla_\theta\log\pi_\theta(a_t|s_t) \cdot A_t$$
+        $$\text{Critic 更新: } \phi \leftarrow \phi - \alpha_c \cdot \nabla_\phi(V_\phi(s_t) - G_t)^2$$
         <div class="formula-annotation">
-            <div class="item"><span class="symbol">Actor $\pi_\theta$</span>策略网络——决定做什么动作。梯度方向：好动作增大概率，坏动作减小概率</div>
-            <div class="item"><span class="symbol">Critic $V_\phi$</span>价值网络——评估状态好坏。训练目标：让预测值 $V_\phi(s)$ 接近真实回报 $G_t$</div>
+            <div class="item"><span class="symbol">Actor $\pi_\theta$</span>策略网络——决定做什么动作。$A_t > 0$ 时增大该动作概率，$A_t < 0$ 时减小</div>
+            <div class="item"><span class="symbol">Critic $V_\phi$</span>价值网络——评估状态好坏。训练目标：预测值 $V_\phi(s)$ 逼近真实回报 $G_t$</div>
+            <div class="item"><span class="symbol">$A_t = G_t - V_\phi(s_t)$</span>Advantage 用 Critic 的输出来计算（替代未知的真实 $V$）</div>
+            <div class="item"><span class="symbol">为什么 Critic 用 MSE？</span>$V(s)$ 的定义是 $\mathbb{E}[G_t|s]$，最小化 $(V_\phi - G_t)^2$ 的期望，解恰好就是条件期望</div>
         </div>
+    </div>
+
+    <div class="box-analogy">
+        <strong>考试类比：</strong>Actor 是学生（决定怎么答题），Critic 是老师（给答题表现打分）。学生根据老师的反馈调整答题策略，老师根据最终成绩修正自己的评分标准。两者互相促进。
     </div>
 
     <div class="box-warning">
@@ -859,15 +877,26 @@ A = 0 → 和平均水平一样</div>
     <p>不在参数空间限制步长，而在<strong>策略分布空间</strong>限制——新旧策略的 KL 散度不能超过 $\delta$。</p>
 
     <h4>前置：重要性采样（Importance Sampling）</h4>
-    <p>用旧策略采的数据来评估新策略的好坏：</p>
+    <p>REINFORCE 每次更新后必须扔掉数据重新采样（on-policy），非常浪费。能不能用旧策略采的数据来评估新策略？</p>
 
     <div class="formula-box">
-        <div class="label">重要性采样目标</div>
-        $$J(\theta) \approx \mathbb{E}_{(s,a) \sim \pi_{\theta_{old}}}\left[\frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)} \cdot A^{\pi_{\theta_{old}}}(s,a)\right]$$
+        <div class="label">重要性采样推导</div>
+        <p>从策略梯度出发：</p>
+        $$\nabla_\theta J = \mathbb{E}_{a \sim \pi_\theta}\left[\nabla_\theta\log\pi_\theta(a|s) \cdot A^\pi(s,a)\right]$$
+        <p>我们想用旧策略 $\pi_{\theta_{old}}$ 采的数据来估计这个期望。重要性采样公式：</p>
+        $$\mathbb{E}_{a \sim \pi_\theta}[f(a)] = \mathbb{E}_{a \sim \pi_{\theta_{old}}}\left[\frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)} \cdot f(a)\right]$$
+        <p>代入策略梯度，并利用 $\nabla_\theta\log\pi_\theta = \frac{\nabla_\theta\pi_\theta}{\pi_\theta}$，整理后得到：</p>
+        $$J(\theta) - J(\theta_{old}) \approx \mathbb{E}_{(s,a) \sim \pi_{\theta_{old}}}\left[\frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)} \cdot A^{\pi_{\theta_{old}}}(s,a)\right]$$
         <div class="formula-annotation">
-            <div class="item"><span class="symbol">$\frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)}$</span>概率比——修正因子。因为数据是旧策略采的，要用新/旧概率比来"校正"</div>
+            <div class="item"><span class="symbol">$\frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)}$</span>概率比——修正因子。数据是旧策略采的，新旧概率比用来"校正"分布差异</div>
             <div class="item"><span class="symbol">$A^{\pi_{\theta_{old}}}$</span>在旧策略下计算的 advantage</div>
+            <div class="item"><span class="symbol">直觉</span>新策略比旧策略更喜欢做好动作（$A>0$时增大概率比）→ 目标增大 → 策略改进</div>
+            <div class="item"><span class="symbol">近似条件</span>$\pi_\theta$ 和 $\pi_{\theta_{old}}$ 不能差太远，否则重要性采样的方差会爆炸</div>
         </div>
+    </div>
+
+    <div class="box-insight">
+        重要性采样解决了"数据复用"问题：不用每次更新都重新采轨迹。但引入了新问题——如果新旧策略差距太大，概率比 $\frac{\pi_\theta}{\pi_{old}}$ 会变得非常大或非常小，导致估计不可靠。这正是 TRPO/PPO 要解决的。
     </div>
 
     <div class="formula-box highlight">
@@ -882,6 +911,20 @@ A = 0 → 和平均水平一样</div>
 
     <div class="box-insight">
         TRPO 说的是："你可以改进策略，但每一步只能在旧策略的<strong>信任域</strong>（trust region）内移动。" 就像走迷宫时每步只能走一小格，确保不会一步踏入死胡同。
+    </div>
+
+    <h4>为什么约束 KL 散度而不约束参数步长？</h4>
+    <div class="formula-box">
+        <div class="label">参数空间 vs 策略分布空间</div>
+        <p>参数空间限制 $\|\theta - \theta_{old}\| \leq \epsilon$ 的问题：</p>
+        $$\text{同样的} \Delta\theta \longrightarrow \begin{cases} \text{softmax 饱和区：概率几乎不变} \\ \text{softmax 线性区：概率剧烈变化} \end{cases}$$
+        <p>KL 散度直接衡量"策略行为变了多少"：</p>
+        $$D_{KL}(\pi_{old}\|\pi_\theta) = \sum_a \pi_{old}(a|s)\log\frac{\pi_{old}(a|s)}{\pi_\theta(a|s)}$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">核心问题</span>参数到概率的映射是非线性的（softmax）。参数空间的"一小步"可能在某些状态导致概率崩塌</div>
+            <div class="item"><span class="symbol">TRPO 的洞察</span>我们真正关心的是"策略的行为变了多少"，而不是"参数改了多少"</div>
+            <div class="item"><span class="symbol">理论保证</span>Kakade & Langford 2002 证明：如果 $D_{KL} \leq \delta$，则新策略的性能下降有<strong>理论上界</strong>——不会崩溃</div>
+        </div>
     </div>
 
     <div class="box-warning">
@@ -904,6 +947,21 @@ A = 0 → 和平均水平一样</div>
 
     <div class="box-insight">
         PPO 的哲学：不需要精确计算"新旧策略差了多远"（KL 散度），直接暴力截断——概率比超过 $1\pm\epsilon$ 就不让你继续动了。粗暴但有效，一阶优化器（Adam）就够用。
+    </div>
+
+    <h4>min() 为什么能实现信任域效果？（形式化分析）</h4>
+    <div class="formula-box">
+        <div class="label">分情况展开 min 的效果</div>
+        <p><strong>当 $A_t > 0$（好动作）：</strong></p>
+        $$L = \min(r_t \cdot A_t, \;\text{clip}(r_t, 1{-}\epsilon, 1{+}\epsilon)\cdot A_t)$$
+        $$= \begin{cases} r_t \cdot A_t & \text{if } r_t \leq 1+\epsilon \quad (\text{正常学习：梯度} = A_t \cdot \nabla r_t) \\ (1+\epsilon) \cdot A_t & \text{if } r_t > 1+\epsilon \quad (\text{梯度为 0，停止增大}) \end{cases}$$
+        <p><strong>当 $A_t < 0$（坏动作）：</strong></p>
+        $$L = \begin{cases} r_t \cdot A_t & \text{if } r_t \geq 1-\epsilon \quad (\text{正常学习：梯度} = A_t \cdot \nabla r_t) \\ (1-\epsilon) \cdot A_t & \text{if } r_t < 1-\epsilon \quad (\text{梯度为 0，停止减小}) \end{cases}$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">关键：min 的作用</span>当 $A_t > 0$ 时，clip 后的值 ≤ 原值，min 取的是 clip 后的（更小=更保守）。当 $A_t < 0$ 时，min 取的也是更小的那个（绝对值更大的惩罚）</div>
+            <div class="item"><span class="symbol">不对称性</span>min 只阻止"过度乐观"的更新，不阻止"回退"。即：如果一个本以为好的动作（$A>0$），概率已经被大幅降低（$r_t < 1-\epsilon$），PPO 不会阻止继续降低——因为这是在修正之前的错误</div>
+            <div class="item"><span class="symbol">vs TRPO</span>TRPO 精确计算 KL 散度再约束；PPO 的 clip 是一个<strong>下界近似</strong>——只要概率比在 $[1-\epsilon, 1+\epsilon]$ 内，KL 散度也一定很小</div>
+        </div>
     </div>
 </section>
 
@@ -971,6 +1029,21 @@ A = 0 → 和平均水平一样</div>
             <div class="item"><span class="symbol">$\lambda = 0$</span>只看当前一步的 TD 误差 → 偏差高、方差低（相信 Critic 的估计）</div>
             <div class="item"><span class="symbol">$\lambda = 1$</span>看到轨迹结束 → 偏差低、方差高（相信真实回报）</div>
             <div class="item"><span class="symbol">$\lambda = 0.95$</span>常用折中值</div>
+        </div>
+    </div>
+
+    <h4>GAE 公式的推导来源</h4>
+    <p>定义 $n$-步 advantage 估计：</p>
+    <div class="formula-box">
+        $$\hat{A}_t^{(n)} = \sum_{l=0}^{n-1}\gamma^l r_{t+l} + \gamma^n V(s_{t+n}) - V(s_t) = \sum_{l=0}^{n-1}\gamma^l\delta_{t+l}$$
+        <p>$n=1$ 时只看一步（低方差、高偏差）；$n=T$ 时看完整轨迹（低偏差、高方差）。</p>
+        <p>GAE 是所有 $n$-步估计的<strong>指数加权平均</strong>：</p>
+        $$\hat{A}_t^{GAE} = (1-\lambda)\left[\hat{A}_t^{(1)} + \lambda\hat{A}_t^{(2)} + \lambda^2\hat{A}_t^{(3)} + \cdots\right]$$
+        <p>展开化简后得到 $\sum_{l=0}^{\infty}(\gamma\lambda)^l\delta_{t+l}$。</p>
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">原理</span>和 TD($\lambda$) 一样：$\lambda$ 控制"短视 vs 远视"的权衡</div>
+            <div class="item"><span class="symbol">$\lambda$ 小</span>主要使用 1-step 估计，依赖 $V$ 的准确性（高偏差、低方差）</div>
+            <div class="item"><span class="symbol">$\lambda$ 大</span>更多使用 Monte Carlo 信号（低偏差、高方差）</div>
         </div>
     </div>
 
@@ -1080,6 +1153,29 @@ A = 0 → 和平均水平一样</div>
 
     <div class="box-analogy">
         <strong>考试类比：</strong>同一道题让模型答 64 遍，有的答对有的答错。答对的属于"好回答"（$\hat{A}>0$），答错的属于"差回答"（$\hat{A}<0$）。然后用 PPO 的方式加强好回答、削弱差回答。全程不需要另一个模型来评估"这道题有多难"——组内平均分本身就是 baseline。
+    </div>
+
+    <h4>为什么 Group Mean 能替代 Critic？（理论连接）</h4>
+    <div class="formula-box">
+        <div class="label">GRPO Baseline 的合理性</div>
+        <p>回顾 Step 2 证明：减去任何与动作无关的常数 $b$，都不改变梯度期望。</p>
+        $$\text{PPO: } A_t = G_t - V(s_t) \quad \longrightarrow \quad \text{GRPO: } \hat{A}_i = r_i - \overline{r}$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">PPO 的 $V(s_t)$</span>用 Critic 网络估计"平均能得多少分"——需要训练一整个大网络</div>
+            <div class="item"><span class="symbol">GRPO 的 $\overline{r}$</span>用同一 prompt 的多次采样取平均——Monte Carlo 估计同样是 $\mathbb{E}[r|x]$ 的无偏估计</div>
+            <div class="item"><span class="symbol">核心假设</span>LLM 的"状态"就是 prompt $x$（单步 MDP），所以 $V(s) = \mathbb{E}[r|x] \approx \frac{1}{G}\sum r_i$</div>
+            <div class="item"><span class="symbol">标准化（除以 std）</span>让不同 prompt 之间的 advantage 量级一致，稳定训练</div>
+        </div>
+    </div>
+
+    <h4>KL 惩罚项 $D_{KL}^{(t)}$ 的展开</h4>
+    <div class="formula-box">
+        $$D_{KL}^{(t)} = \frac{\pi_\theta(a_{i,t}|s_{i,t})}{\pi_{ref}(a_{i,t}|s_{i,t})} - \log\frac{\pi_\theta(a_{i,t}|s_{i,t})}{\pi_{ref}(a_{i,t}|s_{i,t})} - 1$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">注意</span>这里的参考模型是 $\pi_{ref}$（SFT 模型），不是 $\pi_{\theta_{old}}$（上一步的策略）</div>
+            <div class="item"><span class="symbol">与 PPO 的区别</span>PPO 通过 clip 隐式约束 $\pi_\theta$ 不偏离 $\pi_{\theta_{old}}$；GRPO 额外加了显式 KL 惩罚约束不偏离 $\pi_{ref}$</div>
+            <div class="item"><span class="symbol">为什么要这一项？</span>防止 reward hacking——模型可能找到得高分但语义退化的"捷径"，KL 约束保持语言质量</div>
+        </div>
     </div>
 
     <h3>GRPO vs PPO 对比</h3>
@@ -1282,29 +1378,46 @@ LLM 训练范式
         <div class="formula-annotation">
             <div class="item"><span class="symbol">$\mathbb{E}[r(x,y)]$</span>最大化 RM 给的奖励</div>
             <div class="item"><span class="symbol">$-\beta D_{KL}$</span>但不要偏离参考模型太远</div>
+            <div class="item"><span class="symbol">本质</span>在"追求高奖励"和"不要跑偏"之间做平衡</div>
         </div>
     </div>
 
-    <p>这个优化问题有<strong>闭合形式的最优解</strong>：</p>
+    <p>这个优化问题有<strong>闭合形式的最优解</strong>（KKT 条件求解）：</p>
     <div class="formula-box">
         $$\pi^*(y|x) = \frac{1}{Z(x)} \pi_{ref}(y|x) \cdot \exp\left(\frac{1}{\beta}r(x,y)\right)$$
         <div class="formula-annotation">
-            <div class="item"><span class="symbol">$Z(x)$</span>归一化常数，确保概率和为 1</div>
+            <div class="item"><span class="symbol">$\pi_{ref}(y|x) \cdot \exp(\frac{r}{\beta})$</span>参考模型概率 × reward 指数加权——reward 高的回答概率被放大</div>
+            <div class="item"><span class="symbol">$Z(x) = \sum_y \pi_{ref}(y|x)\exp(\frac{r(x,y)}{\beta})$</span>归一化常数——确保所有 $y$ 的概率加起来 = 1</div>
+            <div class="item"><span class="symbol">$\beta$ 的作用</span>$\beta$ 小 → $\exp(\frac{r}{\beta})$ 倍数大 → 高 reward 回答被极大放大 → 策略激进。$\beta$ 大 → 接近 $\pi_{ref}$ → 保守</div>
         </div>
     </div>
 
     <h4>Step 2: 反解出 Reward</h4>
-    <p>从上式解出 $r$：</p>
+    <p>对最优解两边取 log：</p>
+    <div class="formula-box">
+        $$\log\pi^*(y|x) = \log\pi_{ref}(y|x) + \frac{1}{\beta}r(x,y) - \log Z(x)$$
+        <p>移项，解出 $r(x,y)$：</p>
+    </div>
     <div class="formula-box highlight">
         $$r(x,y) = \beta\log\frac{\pi^*(y|x)}{\pi_{ref}(y|x)} + \beta\log Z(x)$$
         <div class="formula-annotation">
-            <div class="item"><span class="symbol">关键洞察</span>reward 可以用"策略的对数概率比"来表示！不需要单独训练 RM。</div>
+            <div class="item"><span class="symbol">$\beta\log\frac{\pi^*}{\pi_{ref}}$</span>最优策略相对参考模型的对数概率比——"最优策略有多偏好这个回答"</div>
+            <div class="item"><span class="symbol">$\beta\log Z(x)$</span>只依赖 $x$ 的常数项——下一步会消掉</div>
+            <div class="item"><span class="symbol">关键洞察</span>reward 可以用"策略的对数概率比"来表示！不需要单独训练 RM</div>
         </div>
     </div>
 
     <h4>Step 3: 代入偏好模型，$Z(x)$ 消掉</h4>
-    <p>Bradley-Terry 模型：$P(y_w \succ y_l) = \sigma(r(x,y_w) - r(x,y_l))$</p>
-    <p>代入反解的 reward，做差时 $\beta\log Z(x)$ 消掉（两个 reward 共享同一个 $x$）：</p>
+    <p>Bradley-Terry 偏好模型：$P(y_w \succ y_l) = \sigma(r(x,y_w) - r(x,y_l))$</p>
+    <p>把 Step 2 的 reward 代入，做差：</p>
+    <div class="formula-box">
+        $$r(x,y_w) - r(x,y_l) = \beta\log\frac{\pi^*(y_w|x)}{\pi_{ref}(y_w|x)} + \cancel{\beta\log Z(x)} - \beta\log\frac{\pi^*(y_l|x)}{\pi_{ref}(y_l|x)} - \cancel{\beta\log Z(x)}$$
+        <div class="formula-annotation">
+            <div class="item"><span class="symbol">$\cancel{\beta\log Z(x)}$</span>两个 reward 共享同一个 prompt $x$，所以 $Z(x)$ 项相减为零——消掉了！</div>
+            <div class="item"><span class="symbol">结果</span>偏好概率只取决于概率比的差，不需要知道归一化常数</div>
+        </div>
+    </div>
+    <p>用可训练的 $\pi_\theta$ 替代理论上的 $\pi^*$，取负对数似然作为损失函数：</p>
 
     <div class="formula-box highlight">
         <div class="label">DPO 最终损失函数</div>
