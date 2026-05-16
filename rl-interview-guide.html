@@ -660,24 +660,105 @@ A = 0 → 和平均水平一样</div>
     <!-- REINFORCE -->
     <h3>Step 1: REINFORCE</h3>
 
-    <h4>目标</h4>
-    <p>找到参数 $\theta$，使策略 $\pi_\theta$ 的期望总回报 $J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)]$ 最大。</p>
-
-    <h4>核心推导：Log-Derivative Trick</h4>
-    <p>轨迹的概率为：</p>
-    <div class="formula-box">
-        $$P(\tau|\theta) = p(s_0) \prod_{t=0}^{T-1} \underbrace{\pi_\theta(a_t|s_t)}_{\text{策略（和 }\theta\text{ 有关）}} \cdot \underbrace{p(s_{t+1}|s_t,a_t)}_{\text{环境动力学（和 }\theta\text{ 无关）}}$$
-    </div>
-    <p>取 log 再对 $\theta$ 求导，环境动力学项消失，只剩策略部分：</p>
-
-    <div class="formula-box highlight">
-        <div class="label">REINFORCE 梯度公式</div>
-        $$\nabla_\theta J = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G_t\right]$$
+    <h4>目标函数</h4>
+    <p>整个 RL 要优化的东西——策略的<strong>期望总回报</strong>：</p>
+    <div class="formula-box key">
+        <div class="label">目标函数定义</div>
+        $$J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)] = \int P(\tau|\theta) \cdot R(\tau) \, d\tau$$
         <div class="formula-annotation">
-            <div class="item"><span class="symbol">$\nabla_\theta \log \pi_\theta(a_t|s_t)$</span>"增大动作 $a_t$ 出现概率"的梯度方向。告诉参数往哪调能让这个动作更可能被选中</div>
-            <div class="item"><span class="symbol">$G_t$</span>从这步开始的累积回报。作为<strong>权重</strong>：回报高 → 大力增大该动作概率；回报低 → 轻微增大甚至反向</div>
-            <div class="item"><span class="symbol">$\mathbb{E}_{\tau \sim \pi_\theta}[\cdots]$</span>在当前策略下采样多条轨迹取平均</div>
-            <div class="item"><span class="symbol">$\sum_t$</span>对轨迹中每一步都做这件事</div>
+            <div class="item"><span class="symbol">$J(\theta)$</span>策略 $\pi_\theta$ 的"平均成绩"——按当前策略玩很多局，所有局回报的平均值</div>
+            <div class="item"><span class="symbol">$\tau \sim \pi_\theta$</span>按策略 $\pi_\theta$ 采样一条轨迹</div>
+            <div class="item"><span class="symbol">$R(\tau)$</span>这条轨迹的总回报</div>
+            <div class="item"><span class="symbol">$P(\tau|\theta)$</span>这条轨迹在策略 $\theta$ 下出现的概率</div>
+            <div class="item"><span class="symbol">$\int \cdots d\tau$</span>对所有可能的轨迹求积分（离散情况下是求和）</div>
+            <div class="item"><span class="symbol">优化方向</span>$J(\theta)$ 越大越好，我们要做<strong>梯度上升</strong>：$\theta \leftarrow \theta + \alpha \nabla_\theta J$</div>
+        </div>
+    </div>
+
+    <h4>核心问题</h4>
+    <p>怎么算 $\nabla_\theta J$？直接求导遇到障碍：$R(\tau)$ 来自环境（黑盒），和 $\theta$ 之间没有显式可微关系。我们不能像监督学习那样直接反向传播。</p>
+
+    <h4>完整推导（5 步）</h4>
+
+    <div class="step-card">
+        <div class="step-number">1</div>
+        <h4 style="padding-top:8px">写出梯度的积分形式</h4>
+        <div class="formula-box">
+            $$\nabla_\theta J = \nabla_\theta \int P(\tau|\theta) \cdot R(\tau) \, d\tau = \int \nabla_\theta P(\tau|\theta) \cdot R(\tau) \, d\tau$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">交换 $\nabla$ 和 $\int$</span>把梯度挪到积分里面（正则条件下可交换）</div>
+                <div class="item"><span class="symbol">问题</span>$\nabla_\theta P(\tau|\theta)$ 不好算——我们没法对环境转移概率求导</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">2</div>
+        <h4 style="padding-top:8px">Log-Derivative Trick（最关键的一步）</h4>
+        <p>利用恒等式 $\nabla f = f \cdot \nabla \log f$（来自 $\frac{d}{dx}\log f = \frac{1}{f}\frac{df}{dx}$）：</p>
+        <div class="formula-box highlight">
+            $$\nabla_\theta P(\tau|\theta) = P(\tau|\theta) \cdot \nabla_\theta \log P(\tau|\theta)$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">效果</span>把"对概率求导"变成了"概率 × 对 log 概率求导"</div>
+                <div class="item"><span class="symbol">好处</span>代入积分后，$P(\tau|\theta)$ 变成了采样权重——可以用蒙特卡洛近似！</div>
+            </div>
+        </div>
+        <p>代入 Step 1：</p>
+        <div class="formula-box">
+            $$\nabla_\theta J = \int P(\tau|\theta) \cdot \nabla_\theta \log P(\tau|\theta) \cdot R(\tau) \, d\tau = \mathbb{E}_{\tau \sim \pi_\theta}\left[\nabla_\theta \log P(\tau|\theta) \cdot R(\tau)\right]$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">$\int P(\tau) \cdot [\cdots] \, d\tau$</span>这就是期望的定义！所以可以写成 $\mathbb{E}_\tau[\cdots]$</div>
+                <div class="item"><span class="symbol">实操意义</span>采样 $N$ 条轨迹，算每条的 $\nabla\log P \cdot R$，取平均，就得到梯度近似</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">3</div>
+        <h4 style="padding-top:8px">展开 $\log P(\tau|\theta)$，消除环境项</h4>
+        <p>轨迹的概率为：</p>
+        <div class="formula-box">
+            $$P(\tau|\theta) = p(s_0) \prod_{t=0}^{T-1} \underbrace{\pi_\theta(a_t|s_t)}_{\text{策略（和 }\theta\text{ 有关）}} \cdot \underbrace{p(s_{t+1}|s_t,a_t)}_{\text{环境动力学（和 }\theta\text{ 无关）}}$$
+        </div>
+        <p>取 log（乘积变求和）：</p>
+        <div class="formula-box">
+            $$\log P(\tau|\theta) = \underbrace{\log p(s_0)}_{\text{与 }\theta\text{ 无关}} + \sum_t \log \pi_\theta(a_t|s_t) + \underbrace{\sum_t \log p(s_{t+1}|s_t,a_t)}_{\text{与 }\theta\text{ 无关}}$$
+        </div>
+        <p>对 $\theta$ 求梯度，第一项和第三项为零：</p>
+        <div class="formula-box key">
+            $$\nabla_\theta \log P(\tau|\theta) = \sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t|s_t)$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">关键结论</span>环境动力学完全消掉了！梯度只依赖策略本身，不需要知道环境模型</div>
+                <div class="item"><span class="symbol">$\nabla_\theta \log \pi_\theta(a_t|s_t)$</span>score function——"让动作 $a_t$ 概率增大"的参数调整方向</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">4</div>
+        <h4 style="padding-top:8px">代入得到初始版本</h4>
+        <div class="formula-box">
+            $$\nabla_\theta J = \mathbb{E}_\tau\left[\left(\sum_{t=0}^{T-1} \nabla_\theta \log\pi_\theta(a_t|s_t)\right) \cdot R(\tau)\right]$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">$R(\tau)$</span>整条轨迹的总回报，作为所有时间步共享的权重</div>
+                <div class="item"><span class="symbol">问题</span>时刻 $t$ 的动作不应该为它之前的奖励"负责"——但 $R(\tau)$ 包含了 $t$ 之前的 $r_0, r_1, \ldots$</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">5</div>
+        <h4 style="padding-top:8px">Reward-to-go 优化</h4>
+        <p>把 $R(\tau)$ 替换为从 $t$ 时刻开始的未来回报 $G_t$。可以证明这不改变梯度期望，但降低方差（因为去掉了和当前动作无关的过去奖励）：</p>
+        <div class="formula-box highlight">
+            <div class="label">REINFORCE 最终梯度公式</div>
+            $$\nabla_\theta J = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G_t\right]$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">$\nabla_\theta \log \pi_\theta(a_t|s_t)$</span>"增大动作 $a_t$ 出现概率"的梯度方向。告诉参数往哪调能让这个动作更可能被选中</div>
+                <div class="item"><span class="symbol">$G_t = \sum_{t'=t}^{T-1} \gamma^{t'-t} r_{t'}$</span>从这步开始的未来累积回报（reward-to-go）。作为<strong>权重</strong>：回报高 → 大力增大该动作概率</div>
+                <div class="item"><span class="symbol">$\mathbb{E}_{\tau \sim \pi_\theta}[\cdots]$</span>在当前策略下采样多条轨迹取平均（实操中用 $N$ 条轨迹的均值近似）</div>
+                <div class="item"><span class="symbol">$\sum_t$</span>对轨迹中每一步都做这件事</div>
+            </div>
         </div>
     </div>
 
