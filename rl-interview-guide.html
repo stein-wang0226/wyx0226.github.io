@@ -748,8 +748,30 @@ A = 0 → 和平均水平一样</div>
 
     <div class="step-card">
         <div class="step-number">5</div>
-        <h4 style="padding-top:8px">Reward-to-go 优化</h4>
-        <p>把 $R(\tau)$ 替换为从 $t$ 时刻开始的未来回报 $G_t$。可以证明这不改变梯度期望，但降低方差（因为去掉了和当前动作无关的过去奖励）：</p>
+        <h4 style="padding-top:8px">Reward-to-go 优化：$R(\tau) \to G_t$</h4>
+        <p>Step 4 中每个时间步都乘以整条轨迹的 $R(\tau)$，但 $R(\tau)$ 包含了时刻 $t$ 之前的奖励——这些和 $a_t$ 的选择无关。下面证明可以去掉它们：</p>
+
+        <p><strong>拆分 $R(\tau)$：</strong></p>
+        <div class="formula-box">
+            $$R(\tau) = \underbrace{(r_0 + \cdots + r_{t-1})}_{\text{过去奖励（和 }a_t\text{ 无关）}} + \underbrace{(r_t + \cdots + r_{T-1})}_{= \; G_t\text{（未来奖励）}}$$
+        </div>
+
+        <p><strong>代入时刻 $t$ 的梯度项：</strong></p>
+        <div class="formula-box">
+            $$\mathbb{E}\left[\nabla_\theta\log\pi_\theta(a_t|s_t) \cdot R(\tau)\right] = \underbrace{\mathbb{E}\left[\nabla_\theta\log\pi_\theta(a_t|s_t) \cdot (r_0{+}\cdots{+}r_{t-1})\right]}_{= \; 0} + \mathbb{E}\left[\nabla_\theta\log\pi_\theta(a_t|s_t) \cdot G_t\right]$$
+        </div>
+
+        <p><strong>为什么第一项 = 0？</strong></p>
+        <div class="formula-box">
+            $$\mathbb{E}_{a_t \sim \pi}\left[\nabla_\theta\log\pi_\theta(a_t|s_t) \cdot c\right] = c \cdot \nabla_\theta \underbrace{\sum_a \pi_\theta(a|s_t)}_{= 1 \text{（概率归一化）}} = c \cdot 0 = 0$$
+            <div class="formula-annotation">
+                <div class="item"><span class="symbol">$c$</span>过去的奖励 $r_0,\ldots,r_{t-1}$ 在 $a_t$ 之前就确定了，对 $a_t$ 的期望来说是常数</div>
+                <div class="item"><span class="symbol">$\sum_a \pi(a|s) = 1$</span>所有动作概率之和永远为 1，对 1 求导 = 0</div>
+                <div class="item"><span class="symbol">直觉</span>时刻 $t$ 的决策只能影响未来，不能改变过去。过去的奖励是"噪声"，去掉后方差更小</div>
+            </div>
+        </div>
+
+        <p><strong>所以只剩下 $G_t$，得到最终公式：</strong></p>
         <div class="formula-box highlight">
             <div class="label">REINFORCE 最终梯度公式</div>
             $$\nabla_\theta J = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G_t\right]$$
