@@ -24,6 +24,111 @@
 <meta name="theme-color" content="#ffffff">
 <link rel="stylesheet" href="{{ base_path }}/assets/css/academicons.css"/>
 
+<!-- Google Fonts: Sora (headings) + JetBrains Mono (code) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Custom style overrides -->
+<style>
+  /* Masthead */
+  .masthead {
+    border-bottom: 2px solid #0d9488;
+  }
+  .masthead__menu-item--lg a {
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 1.1em;
+  }
+
+  /* Sidebar author profile */
+  .author__avatar img {
+    border: 3px solid #0d9488;
+    padding: 4px;
+    box-shadow: 0 4px 16px rgba(13, 148, 136, 0.12);
+    transition: transform 0.3s ease;
+  }
+  .author__avatar img:hover {
+    transform: scale(1.03);
+  }
+  .author__name {
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Sora', -apple-system, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* Page content headings */
+  .page__content h1 {
+    border-bottom: 3px solid #0d9488;
+    padding-bottom: 12px;
+  }
+  .page__content h2 {
+    border-bottom: 1px solid #e8eaed;
+    padding-bottom: 8px;
+    margin-top: 2em;
+  }
+
+  /* Publication entries - better visual hierarchy */
+  .page__content ul li {
+    margin-bottom: 16px;
+    line-height: 1.7;
+  }
+
+  /* Tables */
+  .page__content table th {
+    background: #0d9488;
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+  .page__content table td {
+    border-bottom: 1px solid #e8eaed;
+  }
+  .page__content table tr:hover td {
+    background: #f0fdfa;
+  }
+
+  /* Code blocks */
+  code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  /* Links */
+  a {
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  a:hover {
+    color: #0f766e;
+  }
+
+  /* News section styling */
+  .page__content ul li strong {
+    color: #0d9488;
+  }
+
+  /* Footer */
+  .page__footer {
+    border-top: 2px solid #0d9488;
+  }
+  .page__footer p, .page__footer a {
+    font-size: 0.8em;
+  }
+
+  /* Smooth page load */
+  #main {
+    animation: fadeUp 0.6s ease forwards;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
 
 <!-- Support for MatJax -->
 <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
